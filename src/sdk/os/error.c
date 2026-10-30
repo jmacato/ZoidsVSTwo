@@ -1,0 +1,118 @@
+/* Reference: https://github.com/doldecomp/sms/blob/main/libs/dolphin/src/os/OSError.c.
+ */
+#include "os_error.h"
+#include "os.h"
+#include "os_interrupt.h"
+#include "os_thread.h"
+#include "mwcc_stdarg.h"
+#define NULL 0
+#define MSR_RI 2
+#define DSP_DMA_START_HI 24
+#define DSP_DMA_START_LO 25
+#define DSP_ARAM_DMA_MM_HI 16
+#define DSP_ARAM_DMA_MM_LO 17
+extern volatile u16 __DSPRegs[32] : 0xCC005000;
+extern volatile u32 __DIRegs[16] : 0xCC006000;
+extern s32 vprintf(const char *, va_list);
+extern u32 OSGetStackPointer(void);
+extern s64 OSGetTime(void);
+extern void PPCHalt(void);
+OSErrorHandler __OSErrorTable[16];
+
+void OSReport(const char *msg, ...)
+{
+    va_list marker;
+    va_start(marker, msg);
+    vprintf(msg, marker);
+    va_end(marker);
+}
+
+void OSPanic(const char *file, int line, const char *msg, ...)
+{
+    va_list marker;
+    u32 i;
+    u32 *p;
+
+    OSDisableInterrupts();
+    va_start(marker, msg);
+    vprintf(msg, marker);
+    va_end(marker);
+    OSReport(" in \"%s\" on line %d.\n", file, line);
+
+    OSReport("\nAddress:      Back Chain    LR Save\n");
+    for (i = 0, p = (u32 *)OSGetStackPointer(); p && (u32)p != 0xffffffff && i++ < 16;
+         p = (u32 *)*p) {
+        OSReport("0x%08x:   0x%08x    0x%08x\n", p, p[0], p[1]);
+    }
+
+    PPCHalt();
+}
+
+OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler)
+{
+    OSErrorHandler oldHandler;
+
+    oldHandler = (OSErrorHandler)__OSErrorTable[error];
+    __OSErrorTable[error] = handler;
+    return oldHandler;
+}
+
+void __OSUnhandledException(u8 exception, struct OSContext *context, u32 dsisr, u32 dar)
+{
+    if (!(context->srr1 & MSR_RI)) {
+        OSReport("Non-recoverable Exception %d", exception);
+    } else {
+        if (__OSErrorTable[exception]) {
+            OSDisableScheduler();
+            __OSErrorTable[exception](exception, context, dsisr, dar);
+            OSEnableScheduler();
+            __OSReschedule();
+            OSLoadContext(context);
+        }
+        if (exception == __OS_EXCEPTION_DECREMENTER) {
+            OSLoadContext(context);
+        }
+        OSReport("Unhandled Exception %d", exception);
+    }
+    OSReport("\n");
+    OSDumpContext(context);
+    OSReport("\nDSISR = 0x%08x                   DAR  = 0x%08x\n", dsisr, dar);
+    OSReport("TB = 0x%016llx\n", OSGetTime());
+
+    switch (exception) {
+    case __OS_EXCEPTION_DSI:
+        OSReport("\nInstruction at 0x%x (read from SRR0) attempted to access "
+                 "invalid address 0x%x (read from DAR)\n",
+                 context->srr0, dar);
+        break;
+    case __OS_EXCEPTION_ISI:
+        OSReport("\nAttempted to fetch instruction from invalid address 0x%x "
+                 "(read from SRR0)\n",
+                 context->srr0);
+        break;
+    case __OS_EXCEPTION_ALIGNMENT:
+        OSReport("\nInstruction at 0x%x (read from SRR0) attempted to access "
+                 "unaligned address 0x%x (read from DAR)\n",
+                 context->srr0, dar);
+        break;
+    case __OS_EXCEPTION_PROGRAM:
+        OSReport("\nProgram exception : Possible illegal instruction/operation "
+                 "at or around 0x%x (read from SRR0)\n",
+                 context->srr0, dar);
+        break;
+
+    case __OS_EXCEPTION_MEMORY_PROTECTION:
+        OSReport("\n");
+        OSReport("AI DMA Address =   0x%04x%04x\n", __DSPRegs[DSP_DMA_START_HI],
+                 __DSPRegs[DSP_DMA_START_LO]);
+        OSReport("ARAM DMA Address = 0x%04x%04x\n", __DSPRegs[DSP_ARAM_DMA_MM_HI],
+                 __DSPRegs[DSP_ARAM_DMA_MM_LO]);
+        OSReport("DI DMA Address =   0x%08x\n", __DIRegs[5]);
+        break;
+    }
+
+    OSReport("\nLast interrupt (%d): SRR0 = 0x%08x  TB = 0x%016llx\n",
+             __OSLastInterrupt, __OSLastInterruptSrr0, __OSLastInterruptTime);
+
+    PPCHalt();
+}
