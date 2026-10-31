@@ -13,8 +13,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub const DOL_SHA1: &str = "b5d0a39d22ea9e59716b4748c5840c0e4be27c79";
-pub const ELF_SHA1: &str = "b3e0c300afa9b36ca8b8e6e7466cca83c75a630c";
+pub const DOL_SHA1: &str = "873470a8dd7a38e22dbabb878d3dd11b3862375f";
+pub const ELF_SHA1: &str = "7924c3347a522b5e1b7ea5eaaa913054d8815072";
 pub fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
@@ -204,7 +204,9 @@ pub fn source_function(path: &Path, reference: &Elf) -> Result<Option<Symbol>> {
 }
 pub fn reference_hash(data: &[u8], expected: &str, label: &str) -> Result<()> {
     if format!("{:x}", Sha1::digest(data)) != expected {
-        return Err(format!("{label} hash does not match the Japanese Zoids VS. II disc.").into());
+        return Err(
+            format!("{label} hash does not match the US Zoids: Battle Legends disc.").into(),
+        );
     }
     Ok(())
 }
@@ -284,8 +286,8 @@ pub fn read_disc(reader: &mut impl Read) -> Result<(Vec<u8>, Vec<u8>)> {
     }
     let mut data = Vec::new();
     extend(reader, &mut data, 0x440)?;
-    if &data[..6] != b"GZSJDA" {
-        return Err("Expected the GZSJDA GameCube disc.".into());
+    if &data[..6] != b"GZSE70" {
+        return Err("Expected the GZSE70 GameCube disc.".into());
     }
     let dol_offset = u32be(&data, 0x420)? as usize;
     let fst_offset = u32be(&data, 0x424)? as usize;

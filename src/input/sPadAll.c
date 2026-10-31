@@ -47,6 +47,9 @@ void sPadAll(void)
     if (IsReset() != 0) {
         reset2 = 1;
     } else {
+        if (sPadResetSTOP != 0) {
+            reset2 = 0;
+        }
         if (reset2 != 0) {
             reset2 = 0;
             TEA_HotReset(0);

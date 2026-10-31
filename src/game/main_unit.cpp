@@ -30,7 +30,9 @@ typedef struct ZoidState {
     f32 position[3];
     u8 pad1B74[0x1BC0 - 0x1B74];
     f32 heading;
-    u8 pad1BC4[0x1CB0 - 0x1BC4];
+    u8 pad1BC4[0x1C2C - 0x1BC4];
+    u8 us_pad_1C2C[0xC];
+    u8 pad1BC4_us[0x1CB0 - 0x1C2C];
     s32 field_1CB0;
     s32 action;
     u8 pad1CB8[0x1D64 - 0x1CB8];
@@ -445,6 +447,7 @@ extern void sEffectDispAll(void);
 extern void GXSetZMode(u8 compare, s32 func, u8 update);
 extern void putErrInt(void);
 extern void sPutFontAllN(void);
+void main(void);
 #pragma force_active on
 static s32 aram_block[16];
 GameMode3 GameMode;
@@ -696,6 +699,7 @@ void init_2(void)
 static const char lit_1432[70] = "-------------------------------------test---------------------------\n";
 #pragma force_active off
 namespace { extern const f32 lit_1453[1]; }
+extern void putUSA(void);
 void main(void)
 {
     s32 d9c = 0;
@@ -788,6 +792,8 @@ c2:
     sPadAll();
     sFontInit();
     OSReport("--------------test-----------ok--------\n");
+    if (GameMode.f38 == 0)
+        putUSA();
     debug11();
     debug11();
     debug11();
@@ -846,40 +852,40 @@ c2:
         }
     }
 }
-#undef lit_1480
-#define lit_1480 "fixGet error\n"
-#undef lit_1481
-#define lit_1481 "fixGet OK \n"
 #undef lit_1482
-#define lit_1482 "resetcode=%X \n"
+#define lit_1482 "fixGet error\n"
 #undef lit_1483
-#define lit_1483 "dev mem alloc \n"
+#define lit_1483 "fixGet OK \n"
 #undef lit_1484
-#define lit_1484 "ver %d %d %d %d \n"
+#define lit_1484 "resetcode=%X \n"
 #undef lit_1485
-#define lit_1485 "NowTime %d/%d/%d %02d:%02d:%02d \n"
+#define lit_1485 "dev mem alloc \n"
 #undef lit_1486
-#define lit_1486 "--------------test-----------ok--------\n"
+#define lit_1486 "ver %d %d %d %d \n"
 #undef lit_1487
-#define lit_1487 "menu/loading/loading.dat"
+#define lit_1487 "NowTime %d/%d/%d %02d:%02d:%02d \n"
 #undef lit_1488
-#define lit_1488 "load ok=================\n"
+#define lit_1488 "--------------test-----------ok--------\n"
 #undef lit_1489
-#define lit_1489 "\n sound init \n"
+#define lit_1489 "menu/loading/loading.dat"
 #undef lit_1490
-#define lit_1490 "\n end sound def load  \n"
+#define lit_1490 "load ok=================\n"
 #undef lit_1491
-#define lit_1491 "mono !!--------------------------\n"
+#define lit_1491 "\n sound init \n"
 #undef lit_1492
-#define lit_1492 "menu/saveload/mc/icon.dat"
+#define lit_1492 "\n end sound def load  \n"
 #undef lit_1493
-#define lit_1493 "icon ok\n"
+#define lit_1493 "mono !!--------------------------\n"
 #undef lit_1494
-#define lit_1494 "menu/caution/caution.dat"
+#define lit_1494 "menu/saveload/mc/icon.dat"
 #undef lit_1495
-#define lit_1495 "ptcl/Zoid_eff"
+#define lit_1495 "icon ok\n"
 #undef lit_1496
-#define lit_1496 "forget partcle \n"
+#define lit_1496 "menu/caution/caution.dat"
+#undef lit_1497
+#define lit_1497 "ptcl/Zoid_eff"
+#undef lit_1498
+#define lit_1498 "forget partcle \n"
 s32 calcEndBattle(void)
 {
     ZoidState *first = &Zoid[0];
@@ -1833,6 +1839,7 @@ void game0(void)
     prevbp = 0;
     gameContinueTm = 660;
     IntSePrologue();
+    dspLoadF = 0;
     OSReport(lit_1318);
     while (1) {
         if (GameMode.f44 == 2) {
@@ -1859,12 +1866,10 @@ void game0(void)
             *(u8 *)(sPad1 + 0x84) = 0;
             *(u8 *)(sPad2 + 0x84) = 0;
         }
-        i2 = gameTime + (j = 0, i = 0);
-        (void)(tick + 1);
-        i = ~ ~ i;
-        j = gameEndF;
-        j = ~ ~ i;
-        i = ~ ~ i;
+        j = ~ ~ bak[8];
+        i2 = ~ ~ j;
+        j = ~gameEndF;
+        i = j + i2;
         if (gameEndF == 5) {
             Tbl7 tbl = *(const Tbl7 *)lit_1047;
             cnt5++;
@@ -2110,8 +2115,8 @@ void game0(void)
             }
             break;
         }
-        i = gameEndF + (j = 0);
         (void)(tick + 1);
+        i = gameEndF + (j = 0);
         if (gameEndF == 12) {
             break;
         }

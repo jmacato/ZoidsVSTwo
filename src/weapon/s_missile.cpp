@@ -64,6 +64,7 @@ typedef struct MisZoid3 {
     u8 pad_19C8[0x1B68 - 0x19C8];
     f32 position[3];
     u8 pad_1B74[0x1C2C - 0x1B74];
+    u8 us_pad_1C2C[0xC];
     f32 knockback[3];
     u8 pad_1C38[0x1D44 - 0x1C38];
     s16 ally_smoke_timer;

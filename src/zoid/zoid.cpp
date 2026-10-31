@@ -210,6 +210,7 @@ typedef struct ZoidState {
     f32 f_base_rz;
     u8 pad_1C04[0x1C];
     f32 launch_velocity[3];
+    u8 us_pad_1C2C[0xC];
     f32 knockback[3];
     f32 field_1D20[3];
     f32 field_1D2C;
@@ -321,7 +322,7 @@ typedef struct ZoidState {
     s32 field_20F8;
 } ZoidState;
 
-typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F8C ? 1 : -1];
+typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F98 ? 1 : -1];
 
 typedef struct PartDat3 {
     u8 pad_0000[0x78];
@@ -479,8 +480,9 @@ extern void HSD_MtxGetScale(f32 matrix[3][4], Vec3 *scale);
 extern void HSD_MtxGetTranslate(Mtx matrix, Vec3 *translation);
 extern s32 HSD_MtxInverseConcat(Mtx inverse, Mtx source, Mtx destination);
 extern void PSMTXCopy(f32 source[3][4], f32 destination[3][4]);
+void ZoidAllPutXZ(void);
 #pragma force_active on
-u64 Zoid[16152];
+u64 Zoid[16176];
 u32 zdsMotTBL[1338] = {
     0x00000000, 0x00000000, 0x00000002, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
     0x00000002, 0x00000002, 0x00000096, 0x00000096, 0x00000096, 0x00000096, 0x00000094, 0x00000094, 
@@ -1181,7 +1183,7 @@ s32 ZoidInit_(ZoidState *zoid, s32 type, s32 usb)
     HSD_JObj *look2;
     ZoidPurge(zoid);
     zoid->field_1E9A = 0;
-    ZS32(0x1D88) = 0;
+    ZS32(0x1D94) = 0;
     data = 0;
     if (sZoidHG != 0) {
         sprintf(path, "zoid/HG/%s.dat", Tea_zoiddat[type].model_name);
@@ -1331,7 +1333,7 @@ s32 ZoidInit_(ZoidState *zoid, s32 type, s32 usb)
         zoid->aobj = (HSD_AObj *)getAnimAobj(zoid->joint->child);
     }
     *(f32 *)((u8 *)zoid + 0x1B40) = 1.0f + zoid->senter_translation_y;
-    ZS32(0x1D84) = 2;
+    ZS32(0x1D90) = 2;
     zoid->field_1EF8 = Tea_zoiddat[type].radar_range;
     ZoidInitParam(zoid);
 
@@ -1558,8 +1560,8 @@ s32 ZoidInit_(ZoidState *zoid, s32 type, s32 usb)
         break;
     }
     ZJ(0x19E8) = look2;
-    ZS32(0x1CB8) = -1;
-    ZS32(0x1CBC) = 0;
+    ZS32(0x1CC4) = -1;
+    ZS32(0x1CC8) = 0;
     OSReport("===================zoid OK============\n");
     return 1;
 }
@@ -2535,7 +2537,7 @@ void zdCalcPre(ZoidState *zoid)
     zoid->field_20C4 = 0;
     zoid->radar_range_bonus = 0;
     zoid->search_range_bonus = 0;
-    *(s32 *)((u8 *)zoid + 0x1F60) = 0;
+    *(s32 *)((u8 *)zoid + 0x1F6C) = 0;
     zoid->armor_bonus = 0;
     zoid->field_20D8 = 0;
     zoid->speed_bonus = 0;
@@ -2545,7 +2547,9 @@ void zdCalcPre(ZoidState *zoid)
     zoid->field_20F4 = 0;
 }
 typedef struct ZoidDataE {
-    u8 pad_000[0x3C];
+    u8 pad_000[0x34];
+    u8 us_pad_0034[0x14];
+    u8 pad_000_us[0x3C - 0x34];
     s32 field_003C;
     u8 pad_040[0x4];
     s32 field_0044;
@@ -3264,7 +3268,7 @@ void sAddAnimAllXor2ANIM(ZoidState *zoid, s32 index)
 }
 #undef Zoid
 typedef struct ZoidAnimRyV2 {
-    u8 pad_0000[0x1CF8];
+    u8 pad_0000[0x1D04];
     f32 child_matrix[3][4];
     f32 heading_delta;
 } ZoidAnimRyV2;
@@ -4593,10 +4597,14 @@ void ZoidAllPutXZ(void)
     s32 state;
     s32 group;
     ZoidState *zoid;
+    u8 *anim;
 
     for (i = 0; i < 16; i++) {
         zoid = &Zoid[i];
         if (zoid->joint != (void *)0) {
+            anim = (u8 *)zoid->anim_data;
+            if (anim == 0 || *(s32 *)(anim + 0xF8) == 3)
+                continue;
             state = zoid->jump_phase;
             group = state & 0xF0;
             if (state == 0) {
@@ -4616,22 +4624,22 @@ void ZoidAllPutXZ(void)
     }
 }
 #undef Zoid
-namespace { extern const f64 lit_2736[1]; }
+namespace { extern const f64 lit_2740[1]; }
 extern void stSetFlag(HSD_JObj *joint, JointPose *pose, f32 alpha);
 extern void sWeaponSetPer(ZoidState *zoid, f32 alpha);
 
 void zdTrans1(ZoidState *zoid)
 {
-    stSetFlag(zoid->joint, zoid->pose, *(f32 *)((u8 *)zoid + 0x1DB8));
-    sWeaponSetPer(zoid, *(f32 *)((u8 *)zoid + 0x1DB8));
-    if (lit_2736[0] == *(f32 *)((u8 *)zoid + 0x1DB8))
-        *(s32 *)((u8 *)zoid + 0x1DB4) &= ~1;
+    stSetFlag(zoid->joint, zoid->pose, *(f32 *)((u8 *)zoid + 0x1DC4));
+    sWeaponSetPer(zoid, *(f32 *)((u8 *)zoid + 0x1DC4));
+    if (lit_2740[0] == *(f32 *)((u8 *)zoid + 0x1DC4))
+        *(s32 *)((u8 *)zoid + 0x1DC0) &= ~1;
     else
-        *(s32 *)((u8 *)zoid + 0x1DB4) |= 1;
+        *(s32 *)((u8 *)zoid + 0x1DC0) |= 1;
 }
 void ZoidTrans(ZoidState *zoid, f32 transformation)
 {
-    *(f32 *)((u8 *)zoid + 0x1DB8) = transformation;
+    *(f32 *)((u8 *)zoid + 0x1DC4) = transformation;
 }
 
 void zdSetMatStel(ZoidState *zoid)
@@ -4648,7 +4656,7 @@ void zdSetMatStelOFF(ZoidState *zoid)
     }
 }
 #pragma force_active on
-namespace { __declspec(section ".sdata2") extern const f64 lit_2736[1] = { 1.0 }; }
+namespace { __declspec(section ".sdata2") extern const f64 lit_2740[1] = { 1.0 }; }
 #pragma force_active off
 void zdStelON(ZoidState *zoid)
 {
@@ -4666,7 +4674,7 @@ void zdStelON(ZoidState *zoid)
         ZoidTrans(zoid, 1.0f);
         zoid->stel_state = ZOID_STEL_FADING;
     } else if (state == ZOID_STEL_FADING) {
-        t = *(f32 *)((u8 *)zoid + 0x1DB8);
+        t = *(f32 *)((u8 *)zoid + 0x1DC4);
         t -= 0.04;
         if (t < 0.0f) {
             t = 0.0f;
@@ -4675,7 +4683,7 @@ void zdStelON(ZoidState *zoid)
         ZoidTrans(zoid, t);
     }
 }
-namespace { extern const f64 lit_2736[1]; }
+namespace { extern const f64 lit_2740[1]; }
 
 void zdStelOFF(ZoidState *zoid)
 {
@@ -4693,9 +4701,9 @@ void zdStelOFF(ZoidState *zoid)
         ZoidTrans(zoid, 0.0f);
         zoid->stel_state = ZOID_STEL_FADING;
     } else if (state == ZOID_STEL_FADING) {
-        t = *(f32 *)((u8 *)zoid + 0x1DB8);
+        t = *(f32 *)((u8 *)zoid + 0x1DC4);
         t += 0.02;
-        if (t > lit_2736[0]) {
+        if (t > lit_2740[0]) {
             t = 1.0f;
             zoid->stel_state = ZOID_STEL_OFF;
         }
@@ -4843,7 +4851,7 @@ void ZoidTransMode(void)
 #undef Zoid
 extern void PSMTXMultVec(f32 matrix[3][4], Vec3 *source, Vec3 *destination);
 extern s32 sCamNN;
-namespace { extern const f32 lit_1885[1]; extern const f32 lit_2853[1]; extern const f32 lit_2854[1]; }
+namespace { extern const f32 lit_1885[1]; extern const f32 lit_2857[1]; extern const f32 lit_2858[1]; }
 
 #define Zoid ((ZoidState *)Zoid)
 
@@ -4856,7 +4864,7 @@ s32 zdClip(s32 flag, f32 matrix[3][4], ZoidState *zoid, Vec3 *out)
 
     height = *(f32 *)((u8 *)zoid->body_coobj + 0x10);
     scale = 0.0f;
-    limit = lit_2853[0];
+    limit = lit_2857[0];
     if (height > lit_1885[0]) {
         scale = 1.0f;
         limit += height;
@@ -4865,10 +4873,10 @@ s32 zdClip(s32 flag, f32 matrix[3][4], ZoidState *zoid, Vec3 *out)
         zoid->clip_point[i] = ((HSD_JObj *)zoid->camera_joint)->matrix[i][3];
     }
     PSMTXMultVec(matrix, (Vec3 *)zoid->clip_point, out);
-    if (out->z >= height * scale + lit_2853[0]) {
+    if (out->z >= height * scale + lit_2857[0]) {
         return 1;
     }
-    if (flag == 0 && out->z < lit_2854[0]) {
+    if (flag == 0 && out->z < lit_2858[0]) {
         return 1;
     }
     if (sCamNN == 1) {
@@ -5067,7 +5075,7 @@ void zdEffectMount(ZoidState *zoid, s32 mount, s32 effect)
     sEffectSet(effect, mode, 0, joint, zoid);
 }
 typedef struct ZoidMountV2 {
-    u8 pad_0000[0x1C70];
+    u8 pad_0000[0x1C7C];
     s32 mounts[5][3];
 } ZoidMountV2;
 
@@ -5091,7 +5099,7 @@ void zdEffectMountTm(ZoidState *zoid, s32 a, s32 b, s32 mode)
     }
 }
 typedef struct ZoidMountIntV2 {
-    u8 pad_0000[0x1C70];
+    u8 pad_0000[0x1C7C];
     s32 mounts[5][3];
 } ZoidMountIntV2;
 
@@ -5322,8 +5330,8 @@ void zdCoStartPos(ZoidState *zoid)
     }
 }
 #pragma force_active on
-namespace { __declspec(section ".sdata2") extern const f32 lit_2853[1] = { 20.0f }; }
-namespace { __declspec(section ".sdata2") extern const f32 lit_2854[1] = { -600.0f }; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_2857[1] = { 20.0f }; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_2858[1] = { -600.0f }; }
 #pragma force_active off
 #define Zoid ((ZoidState *)Zoid)
 
@@ -5494,7 +5502,9 @@ void zdLen(s32 a, s32 b)
 #pragma pop
 #undef Zoid
 typedef struct ZoidDataA {
-    u8 reserved_000[0x6B2];
+    u8 reserved_000[0x34];
+    u8 us_pad_0034[0x14];
+    u8 reserved_000_us[0x6B2 - 0x34];
     s16 attack_ranges[12];
     s16 attack_angles_a[12];
     s16 attack_angles[12];
@@ -6168,7 +6178,7 @@ s32 zdAtkZdZdDmgHp(ZoidState *zoid)
     }
     idx = zoid->attack_index;
     if (idx >= 0 && idx <= 11) {
-        dmg = *(s16 *)((u8 *)Tea_zoiddat + type * 0x7E8 + idx * 2 + 0x742);
+        dmg = *(s16 *)((u8 *)Tea_zoiddat + type * 0x7FC + idx * 2 + 0x756);
     } else {
         dmg = 10;
     }
@@ -6334,7 +6344,7 @@ f32 zdCoCoMinR0(u8 *pa, u8 *pb, Vec3 *direction, void *amax, void *bmax)
 #pragma pop
 extern f32 zdCoCoMinR0(u8 *a, u8 *b, Vec3 *direction, void *c, void *d);
 extern f32 sLenPoint3dR(f32 *point);
-namespace { extern const f64 lit_2736[1]; }
+namespace { extern const f64 lit_2740[1]; }
 
 f32 zdCoCoMinR(ZoidState *a, ZoidState *b)
 {
@@ -6424,7 +6434,7 @@ f32 zdCoCoMinR(ZoidState *a, ZoidState *b)
     d = sLenPoint3dR(&push.x);
     if (d <= lit_1423[0])
         return 0.0f;
-    if (max > lit_2736[0]) {
+    if (max > lit_2740[0]) {
         max = 1.0f;
         for (k = 0; k < 3; k++)
             (&push.x)[k] *= max / d;
@@ -6974,7 +6984,7 @@ f32 zdDownBody(ZoidState *zoid, CoObj *co)
     return depth;
 }
 #pragma pop
-namespace { extern const f64 lit_4770[1]; }
+namespace { extern const f64 lit_4774[1]; }
 
 #pragma push
 #pragma dont_inline off
@@ -7010,7 +7020,7 @@ void zdDownBodyIK(ZoidState *zoid, CoObj *co, f32 offset)
     normal = grdcGetNormal(sel);
     if (normal != 0 && normal[1] < 0.5) {
         for (i = 0; i < 3; i++) {
-            s = lit_4770[0] * normal[i];
+            s = lit_4774[0] * normal[i];
             slide[i] = s;
         }
         zdDownBodyMove(zoid, slide);
@@ -7021,7 +7031,7 @@ void zdDownBodyIK(ZoidState *zoid, CoObj *co, f32 offset)
     HSD_JObjSetScaleZ(joint, 1.0f);
 }
 #pragma pop
-namespace { extern const f32 lit_4809[1]; }
+namespace { extern const f32 lit_4813[1]; }
 extern f32 beSide(f32 value, f32 target, f32 step);
 
 void ZoidDownBody(ZoidState *zoid)
@@ -7091,7 +7101,7 @@ void ZoidDownBody(ZoidState *zoid)
             zoid->height_offset = 2.0f;
     }
     if (((u8 *)info)[0x70B] & 4)
-        zoid->height_offset = beSide(zoid->height_offset, 0.0f, lit_4809[0]);
+        zoid->height_offset = beSide(zoid->height_offset, 0.0f, lit_4813[0]);
     zdSetXYZ(zoid);
     sMakeMatrix(zoid->joint);
 }
@@ -8382,8 +8392,8 @@ void zdWeaponFire1(ZoidState *zoid)
     }
 }
 #undef Zoid
-#undef lit_5651
-#define lit_5651 "fire-1 md=%d \n"
+#undef lit_5655
+#define lit_5655 "fire-1 md=%d \n"
 
 void zdWeaponFireON_(ZoidState *zoid, s32 selected)
 {
@@ -8658,8 +8668,8 @@ void zdOptionLoop(ZoidState *zoid)
 void zdSmokeRecv(ZoidState *zoid)
 {
     if (zoid != 0 && zoid->joint != 0) {
-        if (*(u16 *)((u8 *)zoid + 0x1D44) != 0) {
-            (*(u16 *)((u8 *)zoid + 0x1D44))--;
+        if (*(u16 *)((u8 *)zoid + 0x1D50) != 0) {
+            (*(u16 *)((u8 *)zoid + 0x1D50))--;
         }
         if (zoid->enemy_smoke_timer != 0) {
             zoid->enemy_smoke_timer--;
@@ -8736,7 +8746,7 @@ void zdAtack1(ZoidState *zoid)
     if (zoid->joint == (void *)0) return;
     zoid->requested_action = 13;
 }
-namespace { extern const f64 lit_5934[1]; extern const f64 lit_5935[1]; extern const f64 lit_5936[1]; }
+namespace { extern const f64 lit_5938[1]; extern const f64 lit_5939[1]; extern const f64 lit_5940[1]; }
 extern void angLimit(f32 *angle);
 extern f32 sinf(f32 x);
 extern f32 cosf(f32 x);
@@ -8772,13 +8782,13 @@ void zdStep0f(ZoidState *zoid, f32 angle)
         } else {
             angLimit(&angle);
             heading = zoid->heading + angle;
-            zoid->launch_velocity[0] = lit_5934[0] * zoid->displacement[0] + sinf(heading);
-            zoid->launch_velocity[2] = lit_5934[0] * zoid->displacement[2] + cosf(heading);
+            zoid->launch_velocity[0] = lit_5938[0] * zoid->displacement[0] + sinf(heading);
+            zoid->launch_velocity[2] = lit_5938[0] * zoid->displacement[2] + cosf(heading);
             magnitude = absf(angle);
             zoid->requested_action = 0x2d;
-            if (magnitude < lit_5935[0]) {
+            if (magnitude < lit_5939[0]) {
                 zoid->requested_action = 0x2d;
-            } else if (magnitude > lit_5936[0]) {
+            } else if (magnitude > lit_5940[0]) {
                 zoid->requested_action = 0x2e;
             } else if (angle > 0.0f) {
                 zoid->requested_action = 0x30;
@@ -8973,8 +8983,8 @@ void zDispCursorPrologue(void)
 {
     csrFile = LoadArc2("debug/mtp_grid.dat");
 }
-#undef lit_6041
-#define lit_6041 "debug/mtp_grid.dat"
+#undef lit_6045
+#define lit_6045 "debug/mtp_grid.dat"
 
 void zDispCursorEpilogue(void)
 {
@@ -9149,19 +9159,19 @@ s32 zdSetTex(u8 *data, u8 *texture, u32 size)
     return 1;
 }
 #undef Zoid
-#undef lit_6144
-#define lit_6144 "tex-size  large      >1024"
-#undef lit_6145
-#define lit_6145 "tex size \x81\x82 file-tex-size"
-#undef lit_6146
-#define lit_6146 "tex size=%d(%d,%d,[%d])    != tsize=%d \n"
-#undef lit_6147
-#define lit_6147 "tex size \x81\x82 file-tex-size    file-tex not CMPR"
 #undef lit_6148
-#define lit_6148 "file -tex   not CMPR\n"
+#define lit_6148 "tex-size  large      >1024"
 #undef lit_6149
-#define lit_6149 "headsize=%d    size = %d \n"
-namespace { extern const char lit_6181[6]; extern const char lit_6183[5]; }
+#define lit_6149 "tex size \x81\x82 file-tex-size"
+#undef lit_6150
+#define lit_6150 "tex size=%d(%d,%d,[%d])    != tsize=%d \n"
+#undef lit_6151
+#define lit_6151 "tex size \x81\x82 file-tex-size    file-tex not CMPR"
+#undef lit_6152
+#define lit_6152 "file -tex   not CMPR\n"
+#undef lit_6153
+#define lit_6153 "headsize=%d    size = %d \n"
+namespace { extern const char lit_6185[6]; extern const char lit_6187[5]; }
 typedef struct ColorImageDesc {
     u8 *image;
     u16 width;
@@ -9221,7 +9231,7 @@ s32 ZoidColor(ZoidState *zoid, s32 color, s32 mode)
         if (SetTex2(data, image, tsize) != 0) {
             zoid->field_1E9A = color;
             free(data);
-            OSReport(lit_6181);
+            OSReport(lit_6185);
             return 1;
         }
     } else {
@@ -9229,7 +9239,7 @@ s32 ZoidColor(ZoidState *zoid, s32 color, s32 mode)
         if ((data = (u8 *)sReadFileU(path, mode)) && zdSetTex(data, image, tsize) != 0) {
             zoid->field_1E9A = color;
             free(data);
-            OSReport(lit_6183);
+            OSReport(lit_6187);
             return 1;
         }
     }
@@ -9245,24 +9255,24 @@ s32 ZoidColor(ZoidState *zoid, s32 color, s32 mode)
     free(data);
     return 0;
 }
-#undef lit_6177
-#define lit_6177 "zoidColor : Zoid.coBody not found."
-#undef lit_6178
-#define lit_6178 "zoidColor : tobj not found."
-#undef lit_6179
-#define lit_6179 "zoidColor : imagedesc(tobj) not found."
-#undef lit_6180
-#define lit_6180 "zoid/all_tex/%s_%c.tpl"
+#undef lit_6181
+#define lit_6181 "zoidColor : Zoid.coBody not found."
 #undef lit_6182
-#define lit_6182 "zoid/all_tex/%s_%c.pic"
+#define lit_6182 "zoidColor : tobj not found."
+#undef lit_6183
+#define lit_6183 "zoidColor : imagedesc(tobj) not found."
 #undef lit_6184
-#define lit_6184 "zoidColor : file not found."
-#undef lit_6185
-#define lit_6185 "text set. error   zd-tex (%d,%d,[%d])\n"
+#define lit_6184 "zoid/all_tex/%s_%c.tpl"
 #undef lit_6186
-#define lit_6186 "zoidColor : set Tex  error    zoid-tex not CMPR"
-#undef lit_6187
-#define lit_6187 "zoid -tex   not CMPR\n"
+#define lit_6186 "zoid/all_tex/%s_%c.pic"
+#undef lit_6188
+#define lit_6188 "zoidColor : file not found."
+#undef lit_6189
+#define lit_6189 "text set. error   zd-tex (%d,%d,[%d])\n"
+#undef lit_6190
+#define lit_6190 "zoidColor : set Tex  error    zoid-tex not CMPR"
+#undef lit_6191
+#define lit_6191 "zoid -tex   not CMPR\n"
 #include "gx_tev.h"
 extern GXColor SkyAmbient;
 extern void jobjAmbient(HSD_JObj *joint, GXColor color);
@@ -9274,10 +9284,10 @@ void zdAmbientSetSky(ZoidState *zoid)
         OSReport("set ambient[%s] ", zoid->name);
     }
 }
-#undef lit_6204
-#define lit_6204 "set ambient[%s] "
+#undef lit_6208
+#define lit_6208 "set ambient[%s] "
 #pragma force_active on
-static const u32 lit_6470[252] = {
+static const u32 lit_6474[252] = {
     0x43BB8000, 0xC3BB8000, 0x00000000, 0x43BB8000, 0x433B0000, 0x00000000, 0x433B0000, 0xC33B0000, 
     0x00000000, 0x00000000, 0x433B0000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
@@ -9488,7 +9498,7 @@ void sdZoidAll(void)
     }
 }
 #undef Zoid
-namespace { extern const f32 lit_4343[1]; extern const f32 lit_6307[1]; extern const f32 lit_6312[1]; }
+namespace { extern const f32 lit_4347[1]; extern const f32 lit_6311[1]; extern const f32 lit_6316[1]; }
 extern f32 sColPtAll(Vec3 *start, Vec3 *end, GroundMask *mask);
 
 s32 zdFaceAtk(ZoidState *zoid, f32 distance, f32 offset)
@@ -9546,27 +9556,27 @@ s32 zdFaceAtk(ZoidState *zoid, f32 distance, f32 offset)
     target.y += distance / 2.0f;
     {
         GroundMask mask2;
-        GroundMask mask = *(const GroundMask *)lit_6307;
+        GroundMask mask = *(const GroundMask *)lit_6311;
 
         mask2 = mask;
         res = sColPtAll(&start, &target, &mask2);
     }
-    if (lit_4343[0] != res) {
+    if (lit_4347[0] != res) {
         return 1;
     }
     {
         GroundMask mask2;
-        GroundMask mask = *(const GroundMask *)lit_6312;
+        GroundMask mask = *(const GroundMask *)lit_6316;
 
         mask2 = mask;
         res = sColPt(&target, &start, &mask2);
     }
-    if (lit_4343[0] != res) {
+    if (lit_4347[0] != res) {
         return 1;
     }
     return 0;
 }
-namespace { extern const f32 lit_4343[1]; extern const f32 lit_6339[1]; extern const f32 lit_6348[1]; }
+namespace { extern const f32 lit_4347[1]; extern const f32 lit_6343[1]; extern const f32 lit_6352[1]; }
 
 f32 zdFreeLen(ZoidState *zoid, f32 length, f32 offset)
 {
@@ -9605,16 +9615,16 @@ f32 zdFreeLen(ZoidState *zoid, f32 length, f32 offset)
     a.z = a.z + length * cosf(angle);
     {
         GroundMask mask;
-        *(u32 *)&mask = *(const u32 *)lit_6339;
+        *(u32 *)&mask = *(const u32 *)lit_6343;
         copy = mask;
         r = sColRealPt(&b, &a, &copy);
     }
-    if (lit_4343[0] == r) {
-        r = lit_6348[0];
+    if (lit_4347[0] == r) {
+        r = lit_6352[0];
     }
     return r * length;
 }
-namespace { extern const f64 lit_6370[1]; }
+namespace { extern const f64 lit_6374[1]; }
 extern f32 zdFreeLen(ZoidState *zoid, f32 length, f32 offset);
 extern void angLimit(f32 *angle);
 
@@ -9641,7 +9651,7 @@ f32 zdFreeAng(ZoidState *zoid, f32 length)
         return 100.0f;
     } else {
         index = count - 1;
-        angle = 2.0 * (3.1415926 * (f32)(lit_6370[0] * (f32)index)) / 360.0;
+        angle = 2.0 * (3.1415926 * (f32)(lit_6374[0] * (f32)index)) / 360.0;
         zoid->field_1FF8[index] = zdFreeLen(zoid, length, angle);
         if (count != 24) {
             zoid->field_2060 = zoid->field_2060 + 1;
@@ -9657,7 +9667,7 @@ f32 zdFreeAng(ZoidState *zoid, f32 length)
                     index = i;
                 }
             }
-            angle = 2.0 * (3.1415926 * (f32)(lit_6370[0] * (f32)index)) / 360.0;
+            angle = 2.0 * (3.1415926 * (f32)(lit_6374[0] * (f32)index)) / 360.0;
             zoid->field_2058 = angle;
             zoid->field_205C = zoid->heading + angle;
             angLimit(&zoid->field_205C);
@@ -9677,10 +9687,10 @@ void zdMotion(ZoidState *zoid, s32 motion)
         return;
     if (zoid->requested_action != 0)
         return;
-    *(s32 *)((u8 *)zoid + 0x1CEC) = motion;
+    *(s32 *)((u8 *)zoid + 0x1CF8) = motion;
     zoid->requested_action = 0x31;
 }
-namespace { extern const f32 lit_4343[1]; extern const f32 lit_6420[1]; }
+namespace { extern const f32 lit_4347[1]; extern const f32 lit_6424[1]; }
 
 s32 zdCol(ZoidState *zoid, f32 *point, f32 radius)
 {
@@ -9705,10 +9715,10 @@ s32 zdCol(ZoidState *zoid, f32 *point, f32 radius)
         end[i] = zoid->clip_point[i] + radius * point[i] / length;
         start[i] = zoid->clip_point[i] - 2.0f * point[i] / length;
     }
-    *(u32 *)&tmp = *(const u32 *)lit_6420;
+    *(u32 *)&tmp = *(const u32 *)lit_6424;
     mask = tmp;
     hit = sColPt((Vec3 *)start, (Vec3 *)end, &mask);
-    if (lit_4343[0] == hit)
+    if (lit_4347[0] == hit)
         return 0;
     return 1;
 }
@@ -9883,7 +9893,7 @@ f32 zdCoGrdRot(ZoidState *zoid, CoObj *object, Vec3 *direction, s32 count)
 }
 #pragma pop
 #pragma force_active on
-namespace { __declspec(section ".sdata2") extern const f32 lit_4343[1] = { 10000.0f }; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_4347[1] = { 10000.0f }; }
 #pragma force_active off
 u16 setCoPoly(s16 index)
 {
@@ -9944,7 +9954,7 @@ s32 zdGroundCoPoly(ZoidState *zoid, CoObj *object, s16 index, GroundPolygon *pol
     anim = zoid->anim_data;
     for (i = 0; i < 3; i++)
         pos[i] = object->joint->matrix[i][3];
-    len = lit_4343[0];
+    len = lit_4347[0];
     if (zdGrdCoPo00(object, polygon) == 0) {
         if (zoid->current_animation > 2) {
             GroundMask mask2;
@@ -9953,7 +9963,7 @@ s32 zdGroundCoPoly(ZoidState *zoid, CoObj *object, s16 index, GroundPolygon *pol
             mask2 = mask;
             len = sColPt00((Vec3 *)object->position, (Vec3 *)pos, polygon, &mask2);
         }
-        if (lit_4343[0] == len)
+        if (lit_4347[0] == len)
             return 0;
         if (flag != 0)
             object->ground_polygon_index = index;
@@ -10227,7 +10237,7 @@ s32 ZoidGround(ZoidState *zoid)
             mask2 = mask;
             sweep = sColPt((Vec3 *)prev, (Vec3 *)cur, &mask2);
         }
-        if (lit_4343[0] != sweep) {
+        if (lit_4347[0] != sweep) {
             sLinier3d(prev, cur, sweep);
             zoid->field_1A98 = 1;
             zoid->field_1C90[0] = 0.0f;
@@ -10256,22 +10266,22 @@ static s32 csrDispON;
 static ModelArchive *csrFile;
 static s32 csrNum = -1;
 #pragma explicit_zero_data on
-static u8 gap_802EF24C[4] = { 0x00, 0x00, 0x00, 0x00 };
+static u8 gap_802F14F4[4] = { 0x00, 0x00, 0x00, 0x00 };
 #pragma explicit_zero_data off
 CamTmpV2 *camTmp = (CamTmpV2 *)&sCamera;
 u32 sCamNS2 = 0x00000001;
-namespace { __declspec(section ".sdata2") extern const f64 lit_4770[1] = { 0.015 }; }
-namespace { __declspec(section ".sdata2") extern const f32 lit_4809[1] = { 0.075f }; }
-namespace { __declspec(section ".sdata2") extern const f64 lit_5934[1] = { 0.8 }; }
-namespace { __declspec(section ".sdata2") extern const f64 lit_5935[1] = { 0.78539815 }; }
-namespace { __declspec(section ".sdata2") extern const f64 lit_5936[1] = { 2.35619445 }; }
-namespace { __declspec(section ".sdata2") extern const char lit_6181[6] = "tex2\n"; }
-namespace { __declspec(section ".sdata2") extern const char lit_6183[5] = "tex\n"; }
-namespace { __declspec(section ".sdata2") extern const f32 lit_6307[1] = { 2.7105054e-20f }; }
-namespace { __declspec(section ".sdata2") extern const f32 lit_6312[1] = { 2.7105054e-20f }; }
-namespace { __declspec(section ".sdata2") extern const f32 lit_6339[1] = { 2.7105054e-20f }; }
-namespace { __declspec(section ".sdata2") extern const f32 lit_6348[1] = { 1.01f }; }
-namespace { __declspec(section ".sdata2") extern const f64 lit_6370[1] = { 15.0 }; }
-namespace { __declspec(section ".sdata2") extern const f32 lit_6420[1] = { 1.6155871e-27f }; }
+namespace { __declspec(section ".sdata2") extern const f64 lit_4774[1] = { 0.015 }; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_4813[1] = { 0.075f }; }
+namespace { __declspec(section ".sdata2") extern const f64 lit_5938[1] = { 0.8 }; }
+namespace { __declspec(section ".sdata2") extern const f64 lit_5939[1] = { 0.78539815 }; }
+namespace { __declspec(section ".sdata2") extern const f64 lit_5940[1] = { 2.35619445 }; }
+namespace { __declspec(section ".sdata2") extern const char lit_6185[6] = "tex2\n"; }
+namespace { __declspec(section ".sdata2") extern const char lit_6187[5] = "tex\n"; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_6311[1] = { 2.7105054e-20f }; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_6316[1] = { 2.7105054e-20f }; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_6343[1] = { 2.7105054e-20f }; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_6352[1] = { 1.01f }; }
+namespace { __declspec(section ".sdata2") extern const f64 lit_6374[1] = { 15.0 }; }
+namespace { __declspec(section ".sdata2") extern const f32 lit_6424[1] = { 1.6155871e-27f }; }
 #pragma force_active off
 }

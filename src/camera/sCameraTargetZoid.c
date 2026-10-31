@@ -13,7 +13,7 @@ void sCameraTargetZoid(CameraState3 *camera, ZoidState *zoid)
     if (camera != (void *)0 && zoid != (void *)0) {
         camera->zoid = zoid;
         joint = 0;
-        camera->target_index = *((u8 *)zoid + 7548);
+        camera->target_index = *((u8 *)zoid + 7560);
         zoid->camera = camera;
         if (*(HSD_JObj **)((u8 *)zoid + 1116) != 0)
             joint = *(HSD_JObj **)((u8 *)zoid + 1116);

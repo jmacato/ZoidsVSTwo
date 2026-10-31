@@ -62,7 +62,9 @@ typedef struct GZoid {
     JObjT *joint;
     u8 pad_0044[0x1B68 - 0x44];
     f32 position[3];
-    u8 pad_1B74[0x1D64 - 0x1B74];
+    u8 pad_1B74[0x1C2C - 0x1B74];
+    u8 us_pad_1C2C[0xC];
+    u8 pad_1B74_us[0x1D64 - 0x1C2C];
     s32 death_started;
     u8 pad_1D68[0x1D7D - 0x1D68];
     u8 slot;
@@ -70,7 +72,7 @@ typedef struct GZoid {
     s32 ai_active;
     u8 pad_1F38[0x1F8C - 0x1F38];
 } GZoid;
-typedef char GZoidSizeCheck[sizeof(GZoid) == 0x1F8C ? 1 : -1];
+typedef char GZoidSizeCheck[sizeof(GZoid) == 0x1F98 ? 1 : -1];
 extern GZoid Zoid[];
 extern s32 vsyncN;
 extern f32 sLenPoint3d(f32 *first, f32 *second);
@@ -951,10 +953,10 @@ s32 SkyAmbient;
 FogT *fogG;
 s32 nowStage = -1;
 static s32 sDispClipOnOff = 1;
-u32 sPad1 = 0x801504A8;
-u32 sPad2 = 0x80150530;
-u32 sPad3 = 0x801505B8;
-u32 sPad4 = 0x80150640;
+u32 sPad1 = 0x80151A08;
+u32 sPad2 = 0x80151A90;
+u32 sPad3 = 0x80151B18;
+u32 sPad4 = 0x80151BA0;
 u32 padBy = 0x000000CA;
 #pragma force_active off
 }

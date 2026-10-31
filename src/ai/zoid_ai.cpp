@@ -48,7 +48,9 @@ typedef struct ZoidState {
     f32 heading;
     u8 pad_1BC4[0x10];
     f32 field_1C90[3];
-    u8 pad_1BE0[0xD0];
+    u8 pad_1BE0[0x1C2C - 0x1BE0];
+    u8 us_pad_1C2C[0xC];
+    u8 pad_1BE0_us[0x1CB0 - 0x1C2C];
     s32 requested_action;
     s32 action;
     u8 pad_1CB8[0x8];
@@ -81,7 +83,7 @@ typedef struct ZoidState {
     u8 pad_1F38[0x54];
 } ZoidState;
 
-typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F8C ? 1 : -1];
+typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F98 ? 1 : -1];
 
 extern ZoidState Zoid[16];
 

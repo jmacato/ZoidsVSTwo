@@ -8,7 +8,7 @@ extern void LoadSheet(void *image, GXTexMapID id);
 extern void DrawFontChar2b(s32 s, s32 t, s32 width, f32 x, f32 y, f32 z, f32 scale);
 extern f32 fontWX(char *text);
 
-void DrawFontChar00(char *string, HSD_JObj *joint, f32 scale)
+void DrawFontChar00(char *string, HSD_JObj *joint, f32 scale, f32 limit)
 {
     s32 width;
     void *image;
@@ -30,13 +30,20 @@ void DrawFontChar00(char *string, HSD_JObj *joint, f32 scale)
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 4);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
     dx = 0.0f;
+    if (limit)
+        dx = 0.5 * (limit - scale * fontWX(string));
     while (*string != 0) {
         if (*string == '\n') {
+            dx = 0.0f;
             string++;
+            if (limit)
+                dx = 0.5 * (limit - scale * fontWX(string));
         } else if (*string == '\r') {
             y -= 24.0f * scale;
             dx = 0.0f;
             string++;
+            if (limit)
+                dx = 0.5 * (limit - scale * fontWX(string));
         } else {
             string = OSGetFontTexture(string, &image, &s, &t, &width);
             LoadSheet(image, GX_TEXMAP0);

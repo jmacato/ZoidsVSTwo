@@ -99,6 +99,7 @@ typedef char GameModeStateSizeCheck[sizeof(GameModeState) == 0x48 ? 1 : -1];
 extern PadState sPad[9];
 extern GameModeState GameMode;
 extern s32 sPadRep;
+extern s32 sPadResetSTOP;
 extern void TEA_HotReset(u32 code);
 
 inline f32 absf(f32 value)
@@ -106,8 +107,9 @@ inline f32 absf(f32 value)
     *(u32 *)&value &= 0x7FFFFFFF;
     return value;
 }
+void sPadGet1(s32 port);
 #pragma force_active on
-static const char lit_613[23] = "addr = %X - %X prg%X \n";
+static const char lit_615[23] = "addr = %X - %X prg%X \n";
 #pragma force_active off
 
 s32 sPad4dbgMenu(void)
@@ -307,6 +309,8 @@ void sPadGet1(s32 port)
     reset = pad->x && pad->b && pad->start;
     if (reset) {
         pad->reset_hold_frames++;
+        if (sPadResetSTOP != 0)
+            pad->reset_hold_frames = 0;
         if (pad->reset_hold_frames > 30)
             TEA_HotReset(0);
     } else {
@@ -319,8 +323,8 @@ void sPadGet1(s32 port)
 }
 #pragma force_active on
 s32 sPadRep;
+s32 sPadResetSTOP;
 static u32 reset2;
 static u32 sPad4dbgFunc;
-static u32 gap_802EF8E4;
 #pragma force_active off
 }

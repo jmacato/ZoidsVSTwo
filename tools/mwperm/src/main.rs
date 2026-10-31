@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use mwperm::project;
 
 #[derive(Parser)]
-#[command(about = "Build and verify the Zoids VS. II decompilation")]
+#[command(about = "Build and verify the Zoids: Battle Legends decompilation")]
 struct Cli {
     #[command(subcommand)]
     command: Operation,

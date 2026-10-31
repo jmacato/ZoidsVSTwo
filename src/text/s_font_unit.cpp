@@ -40,6 +40,7 @@ static void *ascFile[5];
 static f32 ascH[5][400];
 static s32 sString[8000];
 #pragma force_active off
+void sPutFontRect(char *string, HSD_JObj *top_left, HSD_JObj *bottom_right, GXColor color, GXColor shadow, s32 alpha, u32 flags);
 #pragma force_active on
 static u32 camFont_pos_wobjdesc[5] = {
     0x00000000, 0x41A00000, 0x41A00000, 0x41A00000, 0x00000000, 
@@ -48,7 +49,7 @@ static u32 camFont_interest_wobjdesc[5] = {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
 };
 u32 cameraFont[14] = {
-    0x00000000, 0x00000001, 0x00000280, 0x000001E0, 0x00000280, 0x000001E0, 0x8011F748, 0x8011F75C, 
+    0x00000000, 0x00000001, 0x00000280, 0x000001E0, 0x00000280, 0x000001E0, 0x80120CA8, 0x80120CBC, 
     0x00000000, 0x00000000, 0x3F8CCCCD, 0x465AC000, 0x42700000, 0x3FAA3D71, 
 };
 static const u32 lit_371[79] = {
@@ -122,10 +123,10 @@ void ascPrologue(void)
 #undef lit_420
 #define lit_420 "jobj"
 #pragma force_active on
-static const u32 lit_681[3] = {
+static const u32 lit_683[3] = {
     0x00000000, 0x00000000, 0x00000000, 
 };
-static const u32 lit_682[3] = {
+static const u32 lit_684[3] = {
     0x00000000, 0x00000000, 0xC5BB8000, 
 };
 #pragma force_active off
@@ -174,68 +175,39 @@ void DrawFontCharXY(f32 x, f32 y, f32 z, s32 s, s32 t, s32 width, f32 sx, f32 sy
     GXTexCoord2s16(s1, t2);
 }
 #pragma dont_inline on
-void sPutFontRect(char *string, HSD_JObj *top_left, HSD_JObj *bottom_right, GXColor color, GXColor shadow,
-                  s32 alpha, u32 flags)
+#pragma force_active on
+static const f32 lit_546[1] = { -1.714704e38f };
+static const f32 lit_550[1] = { 1.0f };
+static const f32 lit_553[1] = { -1.7146928e38f };
+static const f32 lit_570[1] = { 15.0f };
+static const f32 lit_571[1] = { 0.0625f };
+static const f32 lit_633[1] = { 0.5f };
+static const f32 lit_706[1] = { 1000.0f };
+static const f32 lit_735[1] = { -1.7146928e38f };
+static const f64 lit_751[1] = { 0.5 };
+static const f32 lit_752[1] = { 24.0f };
+#pragma force_active off
+void putUSA(void)
 {
-    s32 width;
-    void *image;
-    s32 s;
-    s32 t;
-    Vec3 eye;
-    char *p;
-    s32 widest;
-    s32 line_width;
-    s32 height;
-    f32 scale_x;
-    f32 scale_y;
-    s32 k;
+    s32 i;
 
-    if (top_left != 0 && bottom_right != 0 && string != 0 && *string != 0) {
-        widest = 0;
-        height = 0;
-        line_width = 0;
-        LastSheet = 0;
-        p = string;
-        while (*p != 0) {
-            if (*p == '\n') {
-                p++;
-            } else if (*p == '\r') {
-                line_width = 0;
-                p++;
-                height += 24;
-            } else {
-                p = OSGetFontTexture(p, &image, &s, &t, &width);
-                line_width += width;
-                if (widest < line_width)
-                    widest = line_width;
-            }
+    for (i = 0; i < 240; i++) {
+        HSD_StartRender(HSD_RP_SCREEN);
+        if (sPutFontCamPrologue() != 0) {
+            sPutStringXYC2("Licensed by Nintendo", 0.0f, 0.0f, -250.0f, 0.6f, 0.7f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF },
+                           (GXColor){ 0x00, 0x00, 0x32, 0x00 }, 0, 2, 3);
+            HSD_StateInvalidate(-1);
+            HSD_CObjEndCurrent();
         }
-        height += 24;
-        if (widest != 0) {
-            scale_x = (bottom_right->matrix[0][3] - top_left->matrix[0][3]) / (f32)widest;
-            scale_y = (top_left->matrix[1][3] - bottom_right->matrix[1][3]) / (f32)height;
-            if (scale_x > scale_y)
-                scale_x = scale_y;
-            sPutFontRectPrologue(color, shadow, alpha, flags);
-            HSD_CObjGetEyePosition(HSD_CObjGetCurrent(), &eye);
-            DrawFontChar00(string, top_left, scale_x);
-            sPutFontRectEpilogue();
-            k = 0;
-            (void)k;
-        }
+        HSD_EndRender();
+        HSD_VICopyXFB(HSD_RP_SCREEN);
+        HSD_VISetXFBDrawDone();
+        VIWaitForRetrace();
+        sPadAll();
     }
 }
-#pragma force_active on
-static const f32 lit_544[1] = { -1.714704e38f };
-static const f32 lit_548[1] = { 1.0f };
-static const f32 lit_551[1] = { -1.7146928e38f };
-static const f32 lit_568[1] = { 15.0f };
-static const f32 lit_569[1] = { 0.0625f };
-static const f32 lit_631[1] = { 0.5f };
-static const f32 lit_704[1] = { 1000.0f };
-static const f32 lit_718[1] = { -1.7146928e38f };
-static const f32 lit_728[1] = { 24.0f };
-#pragma force_active off
+#undef lit_813
+#define lit_813 "Licensed by Nintendo"
 void EndeFin(void)
 {
     s32 i;
@@ -243,7 +215,7 @@ void EndeFin(void)
     for (i = 0; i < 600; i++) {
         HSD_StartRender(HSD_RP_SCREEN);
         if (sPutFontCamPrologue() != 0) {
-            sPutStringXYC2("B A T T L E  A L L  O V E R .", 0.0f, 0.0f, -200.0f, 0.6f, 0.7f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF },
+            sPutStringXYC2("G A M E   O V E R .", 0.0f, 0.0f, -200.0f, 0.6f, 0.7f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF },
                            (GXColor){ 0x00, 0x00, 0x32, 0x00 }, 0, 2, 3);
             sPutStringXYC2("Thank you for your playing!", 0.0f, -50.0f, -250.0f, 0.6f, 0.7f,
                            (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF }, (GXColor){ 0x00, 0x00, 0x32, 0x00 }, 0, 2, 3);
@@ -261,10 +233,10 @@ void EndeFin(void)
     }
     resetSkipOp();
 }
-#undef lit_790
-#define lit_790 "B A T T L E  A L L  O V E R ."
-#undef lit_794
-#define lit_794 "Thank you for your playing!"
+#undef lit_847
+#define lit_847 "G A M E   O V E R ."
+#undef lit_849
+#define lit_849 "Thank you for your playing!"
 #pragma force_active on
 static s8 *asc00 = (s8 *)lit_371;
 static s8 *asc01 = (s8 *)lit_372;

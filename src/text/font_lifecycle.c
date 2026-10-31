@@ -32,6 +32,8 @@ s32 sFontInit(void)
         FontData = OSAllocFromHeap(__OSCurrHeap, OS_FONT_SIZE_SJIS);
     else
         FontData = OSAllocFromHeap(__OSCurrHeap, OS_FONT_SIZE_ANSI);
+    if (FontData == 0)
+        FontData = OSAllocFromHeap(__OSCurrHeap, OS_FONT_SIZE_ANSI);
     if (!OSInitFont(FontData))
         return 0;
     FontSize = (s16)(FontData->cellWidth * 16);

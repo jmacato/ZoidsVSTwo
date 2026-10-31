@@ -1,13 +1,13 @@
-# Zoids VS. II decompilation
+# Zoids: Battle Legends decompilation
 
-A matching decompilation of Zoids VS. II for the GameCube (Japan, game ID `GZSJDA`). All 3,233 functions of the game (1,121,480 bytes) compile from the C and C++ sources in this repository to the same bytes as the original executable, and the rebuilt `main.dol` is identical to the original.
+A matching decompilation of Zoids: Battle Legends for the GameCube (game ID `GZSE70`), the US release of Zoids VS. II. All 3,243 functions of the game (1,126,796 bytes) compile from the C and C++ sources in this repository to the same bytes as the original executable, and the rebuilt `main.dol` matches it. The `main` branch holds the Japanese Zoids VS. II version.
 
 This repository contains no game data and no compilers.
 
 ## Requirements
 
 - macOS or Linux, with Rust 1.88 or later.
-- Your own copy of the game as a disc image, `game.iso` in the repository root (SHA-256 `c050d3dc9b53dae81c53b2908edc5bc6a106c9a8a2bf695a888a14a995b9f008`).
+- Your own copy of the game as a disc image, `game.iso` in the repository root (SHA-256 `22f0351430ab95ce75f7d90ebede70fffd2d9a4772de3af81bd301fb1455917c`).
 - Your own copy of the Metrowerks CodeWarrior for GameCube compilers, versions 1.2.5, 1.2.5n and 1.1p1.
 
 Place each compiler, as an executable your system can run, at:
@@ -27,7 +27,7 @@ make verify   # compile every source file and compare each function with the ori
 make build    # write build/main.dol and check its SHA-1
 ```
 
-Use a disc image at another path with `make verify ISO=path/to/game.iso`. A complete run ends with `PASS 3233 C/C++ functions, 1121480 bytes; complete DOL reconstruction matches b5d0a39d22ea9e59716b4748c5840c0e4be27c79.`
+Use a disc image at another path with `make verify ISO=path/to/game.iso`. A complete run ends with `PASS 3243 C/C++ functions, 1126796 bytes; complete DOL reconstruction matches 873470a8dd7a38e22dbabb878d3dd11b3862375f.`
 
 ## Layout
 

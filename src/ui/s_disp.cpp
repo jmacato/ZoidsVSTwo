@@ -69,6 +69,7 @@ typedef struct ZoidState {
     f32 heading;
     f32 high_angle;
     u8 pad_1BC8[0x64];
+    u8 us_pad_1C2C[0xC];
     f32 knockback[3];
     u8 pad_1C38[0x78];
     s32 requested_action;
@@ -101,10 +102,10 @@ typedef struct ZoidState {
     u8 pad_1E40[0x14C];
 } ZoidState;
 
-typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F8C ? 1 : -1];
+typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F98 ? 1 : -1];
 
 typedef struct ZoidName2 {
-    u8 bytes[0x7E8];
+    u8 bytes[0x7FC];
 } ZoidName2;
 
 typedef struct CameraState2 CameraState2;
@@ -277,6 +278,7 @@ typedef struct DispCamera {
     struct HSD_CObj *cobj;
 } DispCamera;
 extern s32 pBak;
+void sDispPause(PauseCamera *camera);
 #pragma force_active on
 static Mtx dspMtx;
 static s32 anmFilter[3];
@@ -1856,7 +1858,7 @@ void sDispOrderAnim(void *arg)
     if (sCamNN == 1 && dspOrder != 0 && gameEndF <= 3 && dspOrderAI >= 0
         && *(s8 *)((u8 *)&mgI + 0x3218) == 0 && arg != (void *)0
         && (zoid = ((DispCamera *)arg)->zoid, zoid != 0)
-        && (data = *(OrderData **)((u8 *)&Zoid[2] + 0x1F30), data != 0)) {
+        && (data = *(OrderData **)((u8 *)&Zoid[2] + 0x1F3C), data != 0)) {
         if (dspPartnerMsgTm == 0 && data->field_8C != 0) {
             dspOrderAI = data->field_8C;
         }
@@ -2437,6 +2439,7 @@ void PartnerFace(s32 message, s32 duration)
     PartnerFaceV(message, duration, -1, -1);
 }
 #define PAD_START(p) (*(s8 *)((u8 *)(p) + 0x4E))
+extern void sPutFontRectC(char *text, HSD_JObj *top_left, HSD_JObj *bottom_right, GXColor color, GXColor shadow, s32 alpha, s32 flags);
 
 void sDispPause(PauseCamera *camera)
 {
@@ -2512,15 +2515,12 @@ void sDispPause(PauseCamera *camera)
             sMakeMatrix(info);
             child = GetChild(info, 0, 0, -1, -1, -1);
             end = GetChild(info, 0, 0, 0, -1, -1);
-            sPutFontRect("\x8f\x9f\x97\x98\x8f\xf0\x8c\x8f", child, end, (GXColor){ 0, 255, 0, 255 }, (GXColor){ 0, 0, 0, 0 }, 0, 2);
             child = GetChild(info, 0, 1, -1, -1, -1);
             end = GetChild(info, 0, 1, 0, -1, -1);
-            sPutFontRect(mgI.victory_text, child, end, (GXColor){ 255, 255, 255, 255 }, (GXColor){ 0, 0, 0, 0 }, 0, 2);
+            sPutFontRectC(mgI.victory_text, child, end, (GXColor){ 255, 255, 255, 255 }, (GXColor){ 0, 0, 0, 0 }, 0, 2);
         }
     }
 }
-#undef lit_1762
-#define lit_1762 "\x8f\x9f\x97\x98\x8f\xf0\x8c\x8f"
 typedef struct PausePad {
     u8 pad_00[0x42];
     s8 field_42;
@@ -2648,8 +2648,8 @@ void sDispBP(void *enable)
         putAscJobj(child, 3, text);
     }
 }
-#undef lit_1830
-#define lit_1830 "%06d"
+#undef lit_1819
+#define lit_1819 "%06d"
 void sDispNext(DispCamera *enable)
 {
     HSD_JObj *joint;

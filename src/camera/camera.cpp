@@ -185,6 +185,7 @@ typedef struct ZoidState {
     f32 f_base_rz;
     u8 pad_1C04[0x1C];
     f32 launch_velocity[3];
+    u8 us_pad_1C2C[0xC];
     f32 knockback[3];
     f32 field_1D20[3];
     f32 field_1D2C;
@@ -256,7 +257,7 @@ typedef struct ZoidState {
     u8 pad_1F7C[0x10];
 } ZoidState;
 
-typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F8C ? 1 : -1];
+typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F98 ? 1 : -1];
 
 typedef struct PadState2 {
     u8 pad_00[0x40];
@@ -532,6 +533,7 @@ extern s32 GameMode[];
 extern void sCameraRela(CameraState2 *camera, Vec3 *position, Vec3 *relative);
 extern s32 SE_TableList[];
 extern f32 sLiner(f32 a, f32 b, f32 t);
+void sCameraCtrl(CameraState2 *camera);
 #pragma force_active on
 u64 sCamera[712];
 static IntSeE IntSe[32];
@@ -546,7 +548,7 @@ static u32 camNormal_interest_wobjdesc[5] = {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
 };
 u32 cameraNormal[14] = {
-    0x00000000, 0x00000001, 0x00000280, 0x000001E0, 0x00000280, 0x000001E0, 0x80128018, 0x8012802C, 
+    0x00000000, 0x00000001, 0x00000280, 0x000001E0, 0x00000280, 0x000001E0, 0x80129578, 0x8012958C, 
     0x00000000, 0x00000000, 0x3F8CCCCD, 0x465AC000, 0x42700000, 0x3FAA3D71, 
 };
 s32 sctblMin1a[4] = {
@@ -579,9 +581,9 @@ s32 sctblMax3a[4] = {
 s32 sctblMax3b[4] = {
     335, 625, 100, 360, 
 };
-static u32 mnStage_1712[16] = {
-    0x8011B9D4, 0x00000004, 0x802EF228, 0x00000000, 0x8011B9E0, 0x00000004, 0x802EF260, 0x00000000, 
-    0x802F1240, 0x00000001, 0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
+static u32 mnStage_1727[16] = {
+    0x8011CF24, 0x00000004, 0x802F14D0, 0x00000000, 0x8011CF30, 0x00000004, 0x802F1508, 0x00000000, 
+    0x802F3500, 0x00000001, 0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
 };
 u32 radarLen[269] = {
     0x00000BB8, 0x000007D0, 0x000007D0, 0x00000BB8, 0x00000BB8, 0x000007D0, 0x000008FC, 0x000008FC, 
@@ -1036,22 +1038,22 @@ void camInEnemy(CameraState2 *camera, ZoidState *zoid)
 #define lit_725 "jobjLook=NULL\n"
 #pragma force_active on
 static const char lit_727[21] = "01234567890123456789";
-static const u64 lit_1438[2] = {
+static const u64 lit_1453[2] = {
     0x0000000A00000276ULL, 0x0000000A000001B8ULL, 
 };
-static const u64 lit_1439[2] = {
+static const u64 lit_1454[2] = {
     0x0000000A00000276ULL, 0x0000000A000000E6ULL, 
 };
-static const u64 lit_1440[2] = {
+static const u64 lit_1455[2] = {
     0x0000000A00000276ULL, 0x000000FA000001D6ULL, 
 };
-static const u64 lit_1441[2] = {
+static const u64 lit_1456[2] = {
     0x0000008200000190ULL, 0x0000006400000168ULL, 
 };
-static const u64 lit_1442[2] = {
+static const u64 lit_1457[2] = {
     0x0000008200000190ULL, 0x0000003C000000B4ULL, 
 };
-static const u64 lit_1443[2] = {
+static const u64 lit_1458[2] = {
     0x0000008200000190ULL, 0x0000012C000001A4ULL, 
 };
 s32 sctblLen = 20;
@@ -1883,7 +1885,16 @@ void sCameraCtrl(CameraState2 *camera)
         camera->substick_held = held;
         if (started != 0) {
             angle = atan2f(-sx, sy);
-            zdStep0f(zoid, angle + camera->yaw - zoid->heading);
+            if (control != 0 && *(s32 *)(control + 0xF8) != 3) {
+                zdStep0f(zoid, angle + camera->yaw - zoid->heading);
+            } else if (absf(sx) > absf(sy)) {
+                zdStep0f(zoid, angle + camera->yaw - zoid->heading);
+            }
+        }
+        if (control != 0 && *(s32 *)(control + 0xF8) == 3) {
+            if (absf(sx) < absf(sy)) {
+                zoid->high_angle = sy;
+            }
         }
         if (zoid != 0 && zoid->index == 0 && Zoid[2].joint != 0 && zoid->slot == Zoid[2].slot) {
             partner = &Zoid[2];
@@ -2198,17 +2209,17 @@ void camVoiceOn(s32 a, s32 b)
     sprintf(buf, "voice/%02d/V%02d_%02d.adp", a, a, b);
     camVoiceSeek(buf);
 }
-#undef lit_1527
-#define lit_1527 "voice/%02d/V%02d_%02d.adp"
+#undef lit_1542
+#define lit_1542 "voice/%02d/V%02d_%02d.adp"
 #pragma force_active on
-static const char lit_1713[9] = "\x92" "e\x83\x89\x83" "C\x83g";
-static const char lit_1714[17] = "\x83G\x83t\x83" "F\x83N\x83g(\x82\xdc\x82\xbe)";
+static const char lit_1728[9] = "\x92" "e\x83\x89\x83" "C\x83g";
+static const char lit_1729[17] = "\x83G\x83t\x83" "F\x83N\x83g(\x82\xdc\x82\xbe)";
 #pragma force_active off
 void camVoiceNow(s32 a, s32 b)
 {
     char buf[256];
 
-    sprintf(buf, lit_1527, a, a, b);
+    sprintf(buf, lit_1542, a, a, b);
     sReadPre();
     TEA_VoiceFilePlay(buf, TEA_VOICEVOL, 0);
 }
@@ -2314,8 +2325,8 @@ s32 camSeTm(CameraState2 *camera, s16 sound, Vec3 *point, s32 volume)
         return 0;
     return IntSeSetTm(id, distance, relative.x, -relative.z, volume);
 }
-#undef lit_1608
-#define lit_1608 "G\xaf\xc8"
+#undef lit_1623
+#define lit_1623 "G\xaf\xc8"
 s32 camSe(CameraState2 *camera, s16 sound, Vec3 *point)
 {
     return camSeTm(camera, sound, point, -1);
@@ -2516,6 +2527,6 @@ u32 sCamNN2;
 s32 sCamNN;
 u32 sCamNormal;
 u32 sLightEfct = 0x00000001;
-static const char lit_1715[4] = "esc";
+static const char lit_1730[4] = "esc";
 #pragma force_active off
 }

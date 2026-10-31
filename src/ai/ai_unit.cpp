@@ -81,6 +81,7 @@ typedef struct ZoidState {
     f32 high_angle;
     u8 pad_1BC8[0x58];
     f32 launch_velocity[3];
+    u8 us_pad_1C2C[0xC];
     f32 knockback[3];
     f32 field_1D20[3];
     f32 field_1D2C;
@@ -132,7 +133,7 @@ typedef struct ZoidState {
     u8 pad_1F3C[0x50];
 } ZoidState;
 
-typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F8C ? 1 : -1];
+typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F98 ? 1 : -1];
 
 extern ZoidState Zoid[16];
 
@@ -412,8 +413,10 @@ extern s32 zdAI_goWall(s32 index, s32 distance, s32 degrees);
 extern s32 zdAI_lenStep(s32 index);
 extern s32 zdAI_freeAng(s32 index, s32 angle);
 extern void aiZoidRunWallEscape(s16 index);
-typedef struct TeaZoid { u8 pad_000[0x6B2]; s16 f6C6; u8 pad_6B4[0x7E8 - 0x6B4]; } TeaZoid;
-typedef char TeaZoidSizeCheck[sizeof(TeaZoid) == 0x7E8 ? 1 : -1];
+typedef struct TeaZoid { u8 pad_000[0x34 - 0x0];
+ u8 us_pad_0034[0x14];
+ u8 pad_000_us[0x6B2 - 0x34]; s16 f6C6; u8 pad_6B4[0x7E8 - 0x6B4]; } TeaZoid;
+typedef char TeaZoidSizeCheck[sizeof(TeaZoid) == 0x7FC ? 1 : -1];
 extern TeaZoid Tea_zoiddat[];
 extern void OSReport(const char *fmt, ...);
 extern void ZeroMemory(void *address, u32 size);

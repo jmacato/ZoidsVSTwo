@@ -6,6 +6,7 @@
 typedef struct ZoidData {
     char name[0x1F];
     char english_name[0x15];
+    u8 us_pad_0034[0x14];
     char model_name[8];
     s32 price;
     s32 sell_price;
@@ -45,7 +46,7 @@ typedef struct ZoidData {
     u8 reserved_07BE[0x2A];
 } ZoidData;
 
-typedef char ZoidDataSizeCheck[sizeof(ZoidData) == 0x7E8 ? 1 : -1];
+typedef char ZoidDataSizeCheck[sizeof(ZoidData) == 0x7FC ? 1 : -1];
 extern ZoidData Tea_zoiddat[];
 
 #endif

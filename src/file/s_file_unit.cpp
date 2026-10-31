@@ -217,19 +217,26 @@ s32 enemyZoid[2];
 s32 enemyChara[2];
 #pragma force_active off
 #pragma dont_inline on
+extern char *strNameGame;
+extern char *strNameMake;
 #pragma force_active on
 static u32 diskErrMsg[10] = {
-    0x80118708, 0x80118714, 0x8011876C, 0x801187A0, 0x8011880C, 0x8011885C, 0x802F05CC, 0x802F05CC, 
-    0x802F05CC, 0x802F05CC, 
+    0x80119BB0, 0x80119BBC, 0x80119C10, 0x80119C10, 0x80119C3C, 0x80119CAC, 0x802F2850, 0x802F2850, 
+    0x802F2850, 0x802F2850, 
 };
 static u32 rdMapStr[5] = {
-    0x802F06A8, 0x802F06AC, 0x802F06B0, 0x802F06B4, 0x802F06B8, 
+    0x802F2948, 0x802F294C, 0x802F2950, 0x802F2954, 0x802F2958, 
 };
-static u32 lit_1733[15] = {
-    0x800132D0, 0x800132F0, 0x800132F0, 0x80013308, 0x80013308, 0x80013308, 0x80013324, 0x80013340, 
-    0x800132D0, 0x800132F0, 0x80013308, 0x80013340, 0x80013340, 0x80013340, 0x800132D0, 
+static u32 lit_1738[15] = {
+    0x80013300, 0x80013320, 0x80013320, 0x80013338, 0x80013338, 0x80013338, 0x80013354, 0x80013370, 
+    0x80013300, 0x80013320, 0x80013338, 0x80013370, 0x80013370, 0x80013370, 0x80013300, 
 };
-static const char lit_386[9] = "LOADing\n";
+static const char lit_371[11] = "file error";
+static const char lit_372[82] = "Disc Cover is open.\nIf you wish to continue the game\nplease close the Disc Cover.";
+static const char lit_373[43] = "Insert the ZOIDS BATTLE LEGENDS Game Disc.";
+static const char lit_374[109] = "The Game Disc could not be read.\nPlease read the Nintendo GameCube Instruction Booklet\nfor more information.";
+static const char lit_375[119] = "An error has occurred.\nTurn the power off and refer\nto the Nintendo GameCube Instruction Booklet\nfor more information.";
+static const char lit_394[9] = "LOADing\n";
 #pragma force_active off
 s32 fChk(char *path)
 {
@@ -255,29 +262,27 @@ s32 fChk(char *path)
         return 0;
     return 1;
 }
-#undef lit_481
-#define lit_481 "ZOIDS.VS2"
+#undef lit_494
+#define lit_494 "ZOIDS.VS2"
 #pragma force_active on
-static const char lit_482[11] = "file error";
-static const char lit_483[86] = "\x83" "f\x83" "B\x83X\x83N\x83J\x83o\x81[\x82\xaa\x8aJ\x82\xa2\x82\xc4\x82\xa2\x82\xdc\x82\xb7\x81" "B\x83Q\x81[\x83\x80\x82\xf0\x91\xb1\x82\xaf\x82\xe9\x8f\xea\x8d\x87\x82\xcd\x81" "A\n\x83" "f\x83" "B\x83X\x83N\x83J\x83o\x81[\x82\xf0\x95\xc2\x82\xdf\x82\xc4\x82\xad\x82\xbe\x82\xb3\x82\xa2\x81" "B";
-static const char lit_484[50] = "\x83]\x83" "C\x83h\x83o\x81[\x83T\x83X\x82Q\x82\xcc\x83" "f\x83" "B\x83X\x83N\x82\xf0\x83Z\x83" "b\x83g\n\x82\xb5\x82\xc4\x82\xad\x82\xbe\x82\xb3\x82\xa2\x81" "B";
-static const char lit_485[108] = "\x82\xb1\x82\xcc\x83" "f\x83" "B\x83X\x83N\x82\xcd\x83]\x83" "C\x83h\x83o\x81[\x83T\x83X\x82Q\x82\xcc\n\x83" "f\x83" "B\x83X\x83N\x82\xc5\x82\xcd\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81" "B\n\x83]\x83" "C\x83h\x83o\x81[\x83T\x83X\x82Q\x82\xcc\x83" "f\x83" "B\x83X\x83N\x82\xf0\x83Z\x83" "b\x83g\n\x82\xb5\x82\xc4\x82\xad\x82\xbe\x82\xb3\x82\xa2\x81" "B";
-static const char lit_486[77] = "\x83" "f\x83" "B\x83X\x83N\x82\xf0\x93\xc7\x82\xdf\x82\xdc\x82\xb9\x82\xf1\x82\xc5\x82\xb5\x82\xbd\x81" "B\n\x82\xad\x82\xed\x82\xb5\x82\xad\x82\xcd\x81" "A\x96{\x91\xcc\x82\xcc\x8e\xe6\x88\xb5\x90\xe0\x96\xbe\x8f\x91\x82\xf0\n\x82\xa8\x93\xc7\x82\xdd\x82\xad\x82\xbe\x82\xb3\x82\xa2\x81" "B";
-static const char lit_487[110] = "\x83G\x83\x89\x81[\x82\xaa\x94\xad\x90\xb6\x82\xb5\x82\xdc\x82\xb5\x82\xbd\x81" "B\n\x96{\x91\xcc\x82\xcc\x83p\x83\x8f\x81[\x83{\x83^\x83\x93\x82\xf0\x89\x9f\x82\xb5\x82\xc4\x93" "d\x8c\xb9\x82\xf0\n\x82n\x82" "e\x82" "e\x82\xc9\x82\xb5\x81" "A\x96{\x91\xcc\x82\xcc\x8e\xe6\x88\xb5\x90\xe0\x96\xbe\x8f\x91\x82\xcc\n\x8ew\x8e\xa6\x82\xc9\x8f]\x82\xc1\x82\xc4\x82\xad\x82\xbe\x82\xb3\x82\xa2\x81" "B";
-static const char lit_662[9] = "PreOpen:";
-static const char lit_700[50] = "error alloc from usrHeap .......................\n";
-static const char lit_707[19] = "\x83\x81\x83\x82\x83\x8a\x82\xaa\x91\xab\x82\xe8\x82\xdc\x82\xb9\x82\xf1";
-static const f32 lit_378[1] = { 0.0f };
-static const char lit_460[7] = "error\n";
-namespace { __declspec(section ".sdata2") extern const f32 lit_461[1] = { 0.0f }; }
-static const f32 lit_462[1] = { -300.0f };
-static const f32 lit_463[1] = { 0.6f };
-static const f32 lit_464[1] = { 0.7f };
-static const char lit_488[7] = "\x83G\x83\x89\x81[";
+static const char lit_668[9] = "PreOpen:";
+static const char lit_705[50] = "error alloc from usrHeap .......................\n";
+static const char lit_712[19] = "\x83\x81\x83\x82\x83\x8a\x82\xaa\x91\xab\x82\xe8\x82\xdc\x82\xb9\x82\xf1";
+static const char lit_376[7] = "\x83G\x83\x89\x81[";
+static const char lit_377[5] = "GZSE";
+static const char lit_378[3] = "70";
+static const f32 lit_386[1] = { 0.0f };
+static const char lit_473[7] = "error\n";
+namespace { __declspec(section ".sdata2") extern const f32 lit_474[1] = { 0.0f }; }
+static const f32 lit_475[1] = { -300.0f };
+static const f32 lit_476[1] = { 0.6f };
+static const f32 lit_477[1] = { 0.7f };
 #pragma force_active off
 void diskError3(s32 message)
 {
     s32 i;
+    if (message == 5)
+        sPadResetSTOP = 1;
     for (i = 0; i < 10; i++) {
         HSD_StartRender(0);
         OSReport("E%d.", message);
@@ -288,7 +293,7 @@ void diskError3(s32 message)
                 if (message > 7)
                     message = 6;
                 sPutStringXYC2(((char **)diskErrMsg)[message], (GXColor){255, 255, 255, 255},
-                               (GXColor){0, 0, 0, 0}, 0, 2, 3, lit_461[0], lit_461[0], lit_462[0], lit_463[0], lit_464[0]);
+                               (GXColor){0, 0, 0, 0}, 0, 2, 3, lit_474[0], lit_474[0], lit_475[0], lit_476[0], lit_477[0]);
                 HSD_StateInvalidate(-1);
             }
             HSD_CObjEndCurrent();
@@ -302,10 +307,10 @@ void diskError3(s32 message)
         DVDGetDriveStatus();
     }
 }
-#undef lit_513
-#define lit_513 "E%d."
-#undef lit_514
-#define lit_514 "n."
+#undef lit_521
+#define lit_521 "E%d."
+#undef lit_522
+#define lit_522 "n."
 #pragma dont_inline off
 void diskError2(s32 error)
 {
@@ -317,7 +322,7 @@ void diskError2(s32 error)
     s32 timer;
     s32 opened;
 
-    OSReport(lit_460);
+    OSReport(lit_473);
     pad_a = 0;
     pad_b = 0;
     timer = 15;
@@ -356,7 +361,7 @@ void diskError2(s32 error)
             message = 2;
         if (status == 6)
             message = 3;
-        if (status == 0 && error != 3 && fChk(lit_481) == 0) {
+        if (status == 0 && error != 3 && fChk(lit_494) == 0) {
             (void)0;
             break;
         }
@@ -387,12 +392,12 @@ void diskError2(s32 error)
     sPadAll();
 }
 #pragma dont_inline on
-#undef lit_571
-#define lit_571 "A0"
-#undef lit_572
-#define lit_572 "[%d.%d]"
-#undef lit_573
-#define lit_573 "A9 "
+#undef lit_579
+#define lit_579 "A0"
+#undef lit_580
+#define lit_580 "[%d.%d]"
+#undef lit_581
+#define lit_581 "A9 "
 #pragma dont_inline off
 void diskError(s32 mode)
 {
@@ -416,12 +421,12 @@ void diskError(s32 mode)
         DVDCancelAll();
         (void)(u16)bad;
         OSReport("D-");
-        if (DVDConvertPathToEntrynum(lit_481) == -1) {
+        if (DVDConvertPathToEntrynum(lit_494) == -1) {
             mode = 3;
             OSReport("D3");
             continue;
         }
-        if (!(opened = DVDOpen(lit_481, &file))) {
+        if (!(opened = DVDOpen(lit_494, &file))) {
             mode = 3;
             OSReport("D4");
             continue;
@@ -465,16 +470,16 @@ void diskError(s32 mode)
         id = DVDGetCurrentDiskID();
         if (id == (void *)0)
             bad = 1;
-        if (id != 0 && strncmp(id->gameName, "GZSJ", 4) != 0)
+        if (id != 0 && strncmp(id->gameName, strNameGame, 4) != 0)
             bad = 1;
-        if (id != 0 && strncmp(id->company, "DA", 2) != 0)
+        if (id != 0 && strncmp(id->company, strNameMake, 2) != 0)
             bad = 1;
         if (bad != 0) {
             OSReport("Din");
             mode = 3;
             continue;
         }
-        if (!(opened = DVDOpen(lit_481, &file))) {
+        if (!(opened = DVDOpen(lit_494, &file))) {
             mode = 3;
             OSReport("D7");
             continue;
@@ -500,28 +505,24 @@ void diskError(s32 mode)
         setEraseColor(fogG->color);
 }
 #pragma dont_inline on
-#undef lit_626
-#define lit_626 "D-"
-#undef lit_627
-#define lit_627 "D3"
-#undef lit_628
-#define lit_628 "D4"
-#undef lit_629
-#define lit_629 "D6"
-#undef lit_630
-#define lit_630 "%d."
-#undef lit_631
-#define lit_631 "D/"
-#undef lit_632
-#define lit_632 "GZSJ"
-#undef lit_633
-#define lit_633 "DA"
 #undef lit_634
-#define lit_634 "Din"
+#define lit_634 "D-"
 #undef lit_635
-#define lit_635 "D7"
+#define lit_635 "D3"
 #undef lit_636
-#define lit_636 "Dh"
+#define lit_636 "D4"
+#undef lit_637
+#define lit_637 "D6"
+#undef lit_638
+#define lit_638 "%d."
+#undef lit_639
+#define lit_639 "D/"
+#undef lit_640
+#define lit_640 "Din"
+#undef lit_641
+#define lit_641 "D7"
+#undef lit_642
+#define lit_642 "Dh"
 s32 chkVS3(void)
 {
     DVDFileInfo file;
@@ -538,11 +539,11 @@ s32 chkVS(void)
     return 0;
 }
 #pragma force_active on
-static const char lit_663[4] = "Cl:";
-static const char lit_664[4] = "V3n";
-static const char lit_665[4] = "V3a";
-static const char lit_666[4] = "Op:";
-static const char lit_667[8] = "PreRet:";
+static const char lit_669[4] = "Cl:";
+static const char lit_670[4] = "V3n";
+static const char lit_671[4] = "V3a";
+static const char lit_672[4] = "Op:";
+static const char lit_673[8] = "PreRet:";
 #pragma force_active off
 s32 fReadO2(void *file, void *memory, s32 length, s32 offset)
 {
@@ -570,12 +571,12 @@ s32 fReadO2(void *file, void *memory, s32 length, s32 offset)
     }
     return 1;
 }
-#undef lit_687
-#define lit_687 "Syns"
-#undef lit_688
-#define lit_688 "Syne"
-#undef lit_689
-#define lit_689 "Synr"
+#undef lit_692
+#define lit_692 "Syns"
+#undef lit_693
+#define lit_693 "Syne"
+#undef lit_694
+#define lit_694 "Synr"
 void *sReadFileLen(char *name, s32 *size)
 {
     DVDFileInfo3 file;
@@ -606,7 +607,7 @@ void *sReadFileLen(char *name, s32 *size)
             OSReport("cannot load file\n");
             DVDClose(&file);
             free(memory);
-            OSReport(lit_460);
+            OSReport(lit_473);
             return 0;
         }
     }
@@ -616,20 +617,20 @@ void *sReadFileLen(char *name, s32 *size)
         *size = length;
     return memory;
 }
-#undef lit_734
-#define lit_734 "loading file (%s) ..."
-#undef lit_735
-#define lit_735 "cannot open file\n"
-#undef lit_736
-#define lit_736 "size[%d].."
-#undef lit_737
-#define lit_737 "error........cannot allocate memory\n"
-#undef lit_738
-#define lit_738 "memAloc...[%X]...."
 #undef lit_739
-#define lit_739 "cannot load file\n"
+#define lit_739 "loading file (%s) ..."
 #undef lit_740
-#define lit_740 "Done\n"
+#define lit_740 "cannot open file\n"
+#undef lit_741
+#define lit_741 "size[%d].."
+#undef lit_742
+#define lit_742 "error........cannot allocate memory\n"
+#undef lit_743
+#define lit_743 "memAloc...[%X]...."
+#undef lit_744
+#define lit_744 "cannot load file\n"
+#undef lit_745
+#define lit_745 "Done\n"
 s32 sReadFileLenPtr(char *name, char *buf, s32 ofst, s32 len)
 {
     DVDFileInfo3 file;
@@ -700,21 +701,21 @@ void *sArchiveLoad(char *name, void **out)
     HSD_ArchiveParse(arc, data, length);
     return arc;
 }
-#undef lit_779
-#define lit_779 "archive load %s "
-#undef lit_780
-#define lit_780 "where?\n"
-#undef lit_781
-#define lit_781 "error lost \n"
-#undef lit_782
-#define lit_782 "archive ok \n"
+#undef lit_784
+#define lit_784 "archive load %s "
+#undef lit_785
+#define lit_785 "where?\n"
+#undef lit_786
+#define lit_786 "error lost \n"
+#undef lit_787
+#define lit_787 "archive ok \n"
 #pragma force_active on
-static const char lit_788[21] = "sArcMem error lost \n";
-static const char lit_838[6] = "%s_%s";
-static const char lit_868[7] = "lobj.h";
-static const char lit_869[5] = "lobj";
+static const char lit_793[21] = "sArcMem error lost \n";
+static const char lit_843[6] = "%s_%s";
+static const char lit_873[7] = "lobj.h";
+static const char lit_874[5] = "lobj";
 #pragma force_active off
-namespace { extern const f32 lit_461[1]; }
+namespace { extern const f32 lit_474[1]; }
 s32 LoadArc(ModelArchive *archive, char *name)
 {
     char *base;
@@ -757,7 +758,7 @@ s32 LoadArc(ModelArchive *archive, char *name)
                            archive->animations->models[0]->shape_animations ? *archive->animations->models[0]->shape_animations : 0);
     }
     sMakeMatrix(joint);
-    HSD_JObjReqAnimAll(joint, lit_461[0]);
+    HSD_JObjReqAnimAll(joint, lit_474[0]);
     setAnimRate(joint, 1.0f);
     archive->camera = HSD_CObjLoadDesc(*archive->animations->camera);
     if (archive->animations->fog != 0 && *archive->animations->fog != 0)
@@ -766,13 +767,13 @@ s32 LoadArc(ModelArchive *archive, char *name)
     arc2++;
     return 1;
 }
-#undef lit_899
-#define lit_899 "not found. [%s]*************************\n"
-#undef lit_900
-#define lit_900 "scene_data"
-#undef lit_902
-#define lit_902 "LoadArc  -----%5d %s\n"
-namespace { extern const f32 lit_461[1]; extern const f32 lit_901[1]; }
+#undef lit_904
+#define lit_904 "not found. [%s]*************************\n"
+#undef lit_905
+#define lit_905 "scene_data"
+#undef lit_907
+#define lit_907 "LoadArc  -----%5d %s\n"
+namespace { extern const f32 lit_474[1]; extern const f32 lit_906[1]; }
 ModelArchive *LoadArc2_(char *name, s32 usb)
 {
     char *p;
@@ -793,7 +794,7 @@ ModelArchive *LoadArc2_(char *name, s32 usb)
         model_data = TEA_USBFileArchiveLoad(name, &data);
     } else {
         if (!fexistU(name, usb)) {
-            OSReport(lit_899, name);
+            OSReport(lit_904, name);
             return 0;
         }
         model_data = sLoad(name, &data);
@@ -804,7 +805,7 @@ ModelArchive *LoadArc2_(char *name, s32 usb)
     arc2++;
     HSD_ArchiveLoadDepends(model_data, 0, 0, 0);
     HSD_ArchiveResolveReference(model_data, 0);
-    scene = HSD_ArchiveGetPublicAddress(model_data, lit_900);
+    scene = HSD_ArchiveGetPublicAddress(model_data, lit_905);
     count = 0;
     if (scene->models != 0) {
         while (scene->models[count] != 0)
@@ -817,7 +818,7 @@ ModelArchive *LoadArc2_(char *name, s32 usb)
             free(data);
         if (model_data != 0)
             sArchivePurge(model_data);
-        putErr(lit_707);
+        putErr(lit_712);
         return 0;
     }
     ZeroMemory(archive, size);
@@ -847,7 +848,7 @@ ModelArchive *LoadArc2_(char *name, s32 usb)
                                    scene->models[i]->shape_animations ? *scene->models[i]->shape_animations : 0);
                 archive->models[i] = joint;
                 sMakeMatrix(joint);
-                HSD_JObjReqAnimAll(joint, lit_461[0]);
+                HSD_JObjReqAnimAll(joint, lit_474[0]);
                 setAnimRate(joint, 1.0f);
             }
         }
@@ -858,9 +859,9 @@ ModelArchive *LoadArc2_(char *name, s32 usb)
         archive->fog = HSD_FogLoadDesc(*scene->fog);
     return archive;
 }
-#undef lit_973
-#define lit_973 "LoadArc2 -----%5d %s\n"
-namespace { extern const f32 lit_461[1]; extern const f32 lit_901[1]; }
+#undef lit_978
+#define lit_978 "LoadArc2 -----%5d %s\n"
+namespace { extern const f32 lit_474[1]; extern const f32 lit_906[1]; }
 ModelArchive *LoadArc2B(void *mem, s32 memsize, char *name)
 {
     s32 i = 0;
@@ -878,7 +879,7 @@ ModelArchive *LoadArc2B(void *mem, s32 memsize, char *name)
     arc2++;
     HSD_ArchiveLoadDepends(model_data, 0, 0, 0);
     HSD_ArchiveResolveReference(model_data, 0);
-    scene = HSD_ArchiveGetPublicAddress(model_data, lit_900);
+    scene = HSD_ArchiveGetPublicAddress(model_data, lit_905);
     count = 0;
     if (scene->models != 0) {
         while (scene->models[count] != 0)
@@ -889,7 +890,7 @@ ModelArchive *LoadArc2B(void *mem, s32 memsize, char *name)
     if (archive == (void *)0) {
         if (model_data != 0)
             sArchivePurge(model_data);
-        putErr(lit_707);
+        putErr(lit_712);
         return 0;
     }
     ZeroMemory(archive, size);
@@ -908,7 +909,7 @@ ModelArchive *LoadArc2B(void *mem, s32 memsize, char *name)
                                    scene->models[i]->shape_animations ? *scene->models[i]->shape_animations : 0);
                 archive->models[i] = joint;
                 sMakeMatrix(joint);
-                HSD_JObjReqAnimAll(joint, lit_461[0]);
+                HSD_JObjReqAnimAll(joint, lit_474[0]);
                 setAnimRate(joint, 1.0f);
             }
         }
@@ -919,12 +920,12 @@ ModelArchive *LoadArc2B(void *mem, s32 memsize, char *name)
         archive->fog = HSD_FogLoadDesc(*scene->fog);
     return archive;
 }
-#undef lit_1003
-#define lit_1003 "LoadArc2B -----%5d %s\n"
+#undef lit_1008
+#define lit_1008 "LoadArc2B -----%5d %s\n"
 #pragma force_active on
-static const char lit_1092[21] = "light anim TBL non \n";
-static const char lit_1093[32] = "light non anim  req=%d(in %d) \n";
-static const char lit_1149[35] = "PurgeArc2 -----------------%5d %s\n";
+static const char lit_1097[21] = "light anim TBL non \n";
+static const char lit_1098[32] = "light non anim  req=%d(in %d) \n";
+static const char lit_1154[35] = "PurgeArc2 -----------------%5d %s\n";
 #pragma force_active off
 #pragma dont_inline off
 void PurgeArc2(ModelArchive *archive)
@@ -956,7 +957,7 @@ void PurgeArc2(ModelArchive *archive)
             sArchivePurge(archive->model_data);
         archive->model_data = 0;
         arc2--;
-        OSReport(lit_1149, arc2, archive);
+        OSReport(lit_1154, arc2, archive);
         if (archive->owned_data != 0)
             free(archive->owned_data);
         archive->owned_data = 0;
@@ -966,14 +967,14 @@ void PurgeArc2(ModelArchive *archive)
     }
 }
 #pragma dont_inline on
-#undef lit_1190
-#define lit_1190 "lobj free ---------------------------------\n"
-#undef lit_1191
-#define lit_1191 "cobj free \n"
-#undef lit_1192
-#define lit_1192 "fl "
-#undef lit_1193
-#define lit_1193 "free OK \n "
+#undef lit_1195
+#define lit_1195 "lobj free ---------------------------------\n"
+#undef lit_1196
+#define lit_1196 "cobj free \n"
+#undef lit_1197
+#define lit_1197 "fl "
+#undef lit_1198
+#define lit_1198 "free OK \n "
 JObj3 *GetChild(JObj3 *joint, s32 first, s32 second, s32 third, s32 fourth, s32 fifth)
 {
     s32 path[8];
@@ -1018,10 +1019,10 @@ void *rdMapInfo(s32 mode, s32 number)
     mgSearchEnemy(&mgI);
     return &mgI;
 }
-#undef lit_1709
-#define lit_1709 "menu/map_info_dat/%s%03d.mg"
+#undef lit_1714
+#define lit_1714 "menu/map_info_dat/%s%03d.mg"
 #pragma force_active on
-static const char lit_1735[22] = "imgsize=%d tsize=%d \n";
+static const char lit_1740[22] = "imgsize=%d tsize=%d \n";
 #pragma force_active off
 char *det_Load(char *name)
 {
@@ -1084,28 +1085,20 @@ s32 jobjColor(void *jobj, char *name, s32 usb)
     free(data);
     return 0;
 }
-#undef lit_1751
-#define lit_1751 "jobjColor : jobj not found."
-#undef lit_1752
-#define lit_1752 "jobjColor : tobj not found."
-#undef lit_1753
-#define lit_1753 "jobjColor : imagedesc(tobj) not found."
-#undef lit_1754
-#define lit_1754 "jobjColor : file not found."
-#undef lit_1755
-#define lit_1755 "tex set. error   jobj-tex (%d,%d,[%d])\n"
 #undef lit_1756
-#define lit_1756 "jobjColor : set Tex  error    jobj-tex not CMPR"
+#define lit_1756 "jobjColor : jobj not found."
 #undef lit_1757
-#define lit_1757 "jobj -tex   not CMPR\n"
+#define lit_1757 "jobjColor : tobj not found."
 #pragma force_active on
-static const char lit_1403[7] = "jobj.h";
-static const char lit_1404[5] = "jobj";
-static const f64 lit_1624[1] = { 1.0 };
-static const char lit_1697[2] = "B";
-static const char lit_1698[2] = "M";
-static const char lit_1699[2] = "D";
-static const char lit_1700[2] = "V";
-static const char lit_1701[2] = "F";
+char *strNameGame = (char *)lit_377;
+char *strNameMake = (char *)lit_378;
+static const char lit_1408[7] = "jobj.h";
+static const char lit_1409[5] = "jobj";
+static const f64 lit_1629[1] = { 1.0 };
+static const char lit_1702[2] = "B";
+static const char lit_1703[2] = "M";
+static const char lit_1704[2] = "D";
+static const char lit_1705[2] = "V";
+static const char lit_1706[2] = "F";
 #pragma force_active off
 }

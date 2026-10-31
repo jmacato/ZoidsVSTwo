@@ -151,6 +151,7 @@ typedef struct ZoidState {
     s32 slide_frames;
     s32 field_1CF8;
     f32 launch_velocity[3];
+    u8 us_pad_1C2C[0xC];
     f32 knockback[3];
     f32 field_1D20[3];
     f32 field_1D2C;
@@ -239,7 +240,7 @@ typedef struct ZoidState {
     u8 pad_1F7C[0x10];
 } ZoidState;
 
-typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F8C ? 1 : -1];
+typedef char ZoidStateSizeCheck[sizeof(ZoidState) == 0x1F98 ? 1 : -1];
 
 extern ZoidState Zoid[];
 extern u32 vsyncN;
@@ -290,7 +291,9 @@ static inline f32 vector_heading(f32 x, f32 z)
 }
 extern void ZoidInertia(ZoidState *zoid);
 typedef struct ZoidDat3 {
-    u8 reserved_000[0x652];
+    u8 reserved_000[0x34 - 0x0];
+    u8 us_pad_0034[0x14];
+    u8 reserved_000_us[0x652 - 0x34];
     s16 attack_effects[12][2];
     s16 attack_effect_mounts[12][2];
     s16 attack_range[24];
@@ -352,6 +355,21 @@ static inline void HSD_JObjSetTranslateZ(HSD_JObj *jobj, f32 z)
     if (!(jobj->flags & JOBJ_MTX_INDEP_SRT))
         HSD_JObjSetMtxDirty(jobj);
 }
+void ZoidMove(ZoidState *zoid);
+extern GroundMask GXColorZoid;
+extern void getWarn(f32 *position, f32 *out);
+extern void zdLimitHigh(ZoidState *zoid);
+extern f32 sColPt(Vec3 *start, Vec3 *end, GroundMask *mask);
+extern f32 sColPtN(Vec3 *start, Vec3 *end, GroundMask *mask, u16 *selector);
+extern f32 sLenXZ(f32 x, f32 z);
+extern f32 zdGetBasePoly(ZoidState *zoid, f32 *point);
+extern s32 chkSusumu(void *joint, f32 *point);
+extern void antiV3(ZoidState *zoid);
+extern void dummyFunc(const char *);
+extern void ZoidWalkSusumu3(ZoidState *zoid);
+extern void ZoidWalkJ3(ZoidState *zoid);
+extern void ZoidSusumuStepVF(ZoidState *zoid);
+extern void ZoidActStepF(ZoidState *zoid);
 
 s32 zdLakkaTest2(ZoidState *zoid)
 {
@@ -775,6 +793,46 @@ void ZoidWalkJ(ZoidState *zoid)
         }
     }
 }
+void ZoidWalkJ3(ZoidState *zoid)
+{
+    f32 point[3];
+    f32 y;
+    u16 selector;
+    f32 cos_high;
+    f32 sin_high;
+    f32 vx;
+    f32 vz;
+    f32 len;
+    void *anim;
+    f32 cosine_high_angle;
+    f32 sine_high_angle;
+
+    if (zoid != (void *)0 && zoid->joint != (void *)0) {
+        anim = (void *)zoid->anim_data;
+        if (anim != 0) {
+            cosine_high_angle = zoid->high_angle;
+            cos_high = cosf(cosine_high_angle);
+            sine_high_angle = zoid->high_angle;
+            sin_high = sinf(sine_high_angle);
+            vx = zoid->displacement[0];
+            vz = zoid->displacement[2];
+            len = sLenXZ(vx, vz);
+            point[0] = zoid->position[0] + vx * cos_high;
+            point[1] = zoid->position[1];
+            point[2] = zoid->position[2] + vz * cos_high;
+            y = zdColPosY(point, &selector);
+            zoid->ground_polygon = selector;
+            if (selector == 0xffff) {
+                zoid->heading += 3.0f;
+            } else {
+                zoid->position[0] += vx * cos_high;
+                zoid->position[2] += vz * cos_high;
+                zoid->position[1] -= len * sin_high;
+                ZoidSisei(zoid);
+            }
+        }
+    }
+}
 extern s32 zdFaceAtk(ZoidState *zoid, f32 distance, f32 offset);
 extern u32 zdsMotTBL[];
 
@@ -856,7 +914,7 @@ void ZoidWalkSumuSpd(ZoidState *zoid)
     }
 }
 #pragma force_active on
-static const f64 lit_848[1] = { 1.0471975333333332 };
+static const f64 lit_859[1] = { 1.0471975333333332 };
 #pragma force_active off
 extern s32 ZoidSisei(ZoidState *zoid);
 extern f64 cos(f64 x);
@@ -997,7 +1055,7 @@ void ZoidWalkSusumu(ZoidState *zoid)
             blocked = 0;
             if (normal != GROUND_POLYGON_NONE) {
                 index = grdcPolygon[normal].normal_index;
-                if (slope > 0.0f && grdcNormal[index].y <= cos(lit_848[0])) {
+                if (slope > 0.0f && grdcNormal[index].y <= cos(lit_859[0])) {
                     blocked = 1;
                 }
             }
@@ -1089,6 +1147,148 @@ void ZoidWalkSusumu(ZoidState *zoid)
         zoid->position[2] += dz;
     }
 }
+void ZoidWalkSusumu3(ZoidState *zoid)
+{
+    f32 next[3];
+    f32 cur[3];
+    u16 selector2;
+    u8 *control;
+    f32 target;
+    f32 limit;
+    f32 angle;
+    f32 ground_y;
+    f32 gap;
+    f32 dx;
+    f32 dz;
+    f32 delta;
+    f32 move;
+    s32 anim;
+    s32 i;
+
+    if (zoid != (void *)0 && zoid->joint != (void *)0) {
+        control = (u8 *)zoid->anim_data;
+        target = zoid->steer;
+        if (zoid->f_base_joint != 0) {
+            if (absf(zoid->f_base_ry - target) < DEG(5)) {
+                zoid->f_base_ry = target;
+            }
+            if (zoid->f_base_ry < target) {
+                zoid->f_base_ry += DEG(3);
+                if (zoid->f_base_ry > target) {
+                    zoid->f_base_ry = target;
+                }
+            }
+            if (zoid->f_base_ry > target) {
+                zoid->f_base_ry -= DEG(3);
+                if (zoid->f_base_ry < target) {
+                    zoid->f_base_ry = target;
+                }
+            }
+            if (zoid->f_base_ry > DEG((f32) * (s32 *)(control + 0xC8))) {
+                zoid->f_base_ry = DEG((f32) * (s32 *)(control + 0xC8));
+            }
+            if (zoid->f_base_ry < -DEG((f32) * (s32 *)(control + 0xC8))) {
+                zoid->f_base_ry = DEG((f32) - *(s32 *)(control + 0xC8));
+            }
+        }
+        if (zoid->field_1ACC != 0) {
+            angle = zoid->senter_roll;
+            if (zoid->current_animation == 5 || zoid->current_animation == 4) {
+                limit = 10.0f * (zoid->steer * zoid->field_1C90[2]);
+            } else {
+                limit = 0.0f;
+            }
+            if (limit < DEG((f32) - *(s32 *)(control + 0x98))) {
+                limit = DEG((f32) - *(s32 *)(control + 0x98));
+            }
+            if (limit > DEG((f32) * (s32 *)(control + 0x98))) {
+                limit = DEG((f32) * (s32 *)(control + 0x98));
+            }
+            if (angle > limit) {
+                angle -= DEG(1);
+                if (angle < limit) {
+                    angle = limit;
+                }
+            }
+            if (angle < limit) {
+                angle += DEG(1);
+                if (angle > limit) {
+                    angle = limit;
+                }
+            }
+            zoid->senter_roll = angle;
+        }
+        ZoidSisei(zoid);
+        for (i = 0; i < 3; i++) {
+            cur[i] = zoid->position[i];
+        }
+        next[0] = zoid->field_1C90[2] * wsinf(zoid->heading) * wcosf(zoid->high_angle) + cur[0];
+        next[1] = zoid->field_1C90[2] * wsinf(-zoid->high_angle) + cur[1];
+        next[2] = zoid->field_1C90[2] * wcosf(zoid->heading) * wcosf(zoid->high_angle) + cur[2];
+        ground_y = zdColPosY(next, &selector2);
+        if (selector2 == GROUND_POLYGON_NONE) {
+            zoid->heading += 3.0f;
+            for (i = 0; i < 3; i++) {
+                zoid->position[i] = zoid->field_1C24[i];
+            }
+            return;
+        }
+        if (next[1] < ground_y) {
+            next[1] = ground_y;
+        }
+        dx = next[0] - zoid->position[0];
+        ground_y = next[1] - zoid->position[1];
+        dz = next[2] - zoid->position[2];
+        target = dx * dx + ground_y * ground_y + dz * dz;
+        delta = zoid->field_1C90[1] * zoid->field_1C90[1];
+        gap = delta - target;
+        if (zoid->field_1C90[1] >= 0.0f && zoid->field_1C90[2] >= 0.0f) {
+            if (gap > 0.0f) {
+                zoid->field_1C90[2] += 0.05;
+                if (zoid->field_1C90[2] > zoid->field_1C90[1]) {
+                    zoid->field_1C90[2] = zoid->field_1C90[1];
+                }
+            }
+            if (gap < 0.0f) {
+                zoid->field_1C90[2] -= 0.05;
+                if (zoid->field_1C90[2] < 0.0f) {
+                    zoid->field_1C90[2] = 0.0f;
+                }
+                if (zoid->field_1C90[2] < zoid->field_1C90[1]) {
+                    zoid->field_1C90[2] = zoid->field_1C90[1];
+                }
+            }
+        } else if (zoid->field_1C90[1] >= 0.0f && zoid->field_1C90[2] < 0.0f) {
+            zoid->field_1C90[2] += 0.05;
+        } else if (zoid->field_1C90[1] < 0.0f && zoid->field_1C90[2] >= 0.0f) {
+            zoid->field_1C90[2] -= 0.05;
+        } else if (zoid->field_1C90[1] < 0.0f && zoid->field_1C90[2] < 0.0f) {
+            if (gap > 0.0f) {
+                zoid->field_1C90[2] -= 0.05;
+                if (zoid->field_1C90[2] < zoid->field_1C90[1]) {
+                    zoid->field_1C90[2] = zoid->field_1C90[1];
+                }
+            }
+            if (gap < 0.0f) {
+                zoid->field_1C90[2] += 0.05;
+                if (zoid->field_1C90[2] > 0.0f) {
+                    zoid->field_1C90[2] = 0.0f;
+                }
+                if (zoid->field_1C90[2] > zoid->field_1C90[1]) {
+                    zoid->field_1C90[2] = zoid->field_1C90[1];
+                }
+            }
+        }
+        anim = zoid->current_animation;
+        move = zoid->field_1C90[2];
+        if (anim == 2 || anim == 1) {
+            move = 0.0f;
+        }
+        zoid->position[0] += dx;
+        zoid->position[1] += ground_y;
+        zoid->position[2] += dz;
+    }
+}
 void ZoidSusumuV(ZoidState *zoid)
 {
     s32 i;
@@ -1175,12 +1375,50 @@ void ZoidSusumuStepV(ZoidState *zoid)
         zoid->ground_polygon = selector;
     }
 }
+typedef struct ZoidStepLaunch {
+    u8 reserved_0000[0x1C2C];
+    f32 step_launch[3];
+} ZoidStepLaunch;
+
+void ZoidSusumuStepVF(ZoidState *zoid)
+{
+    u16 sel;
+    void *anim;
+    f32 length;
+    f32 y;
+    s32 i;
+
+    if (zoid != (void *)0 && zoid->joint != (void *)0) {
+        anim = zoid->anim_data;
+        ZoidSisei(zoid);
+        ((ZoidStepLaunch *)zoid)->step_launch[1] = 0.0f;
+        for (i = 0; i < 3; i++) {
+            zoid->position[i] += ((ZoidStepLaunch *)zoid)->step_launch[i];
+        }
+        zoid->position[0] += 1.0f;
+        y = zdColPosY(zoid->position, &sel);
+        length = y - zoid->position[1];
+        if (length > 0.0f) {
+            zoid->height_offset_speed = 0.0f;
+            zoid->height_offset -= length;
+            zoid->position[1] += length;
+        }
+        zoid->ground_polygon = sel;
+    }
+}
 #pragma push
 #pragma auto_inline off
 void ZoidWalk(ZoidState *zoid)
 {
+    u8 *anim = 0;
+
+    if (zoid != 0)
+        anim = (u8 *)zoid->anim_data;
     ZoidWalkSumuSpd(zoid);
-    ZoidWalkSusumu(zoid);
+    if (anim != 0 && *(s32 *)(anim + 0xF8) == 3)
+        ZoidWalkSusumu3(zoid);
+    else
+        ZoidWalkSusumu(zoid);
 }
 #pragma pop
 typedef struct ZoidControlSpan {
@@ -1577,6 +1815,12 @@ void ZoidJump(ZoidState *zoid)
     if (zoid->jump_phase == 49) {
         mode = 0;
     }
+    if (control != 0 && control->field_00F8 == 3) {
+        mode = 3;
+    }
+    if (mode == 3) {
+        ZoidWalkJ3(zoid);
+    }
     if (mode == 2) {
         ZoidWalkJ(zoid);
     }
@@ -1585,13 +1829,13 @@ void ZoidJump(ZoidState *zoid)
     }
 }
 #pragma force_active on
-static const u32 lit_1601[5] = {
+static const u32 lit_1733[5] = {
     0x00000043, 0x00000045, 0x00000047, 0x00000049, 0x0000004B, 
 };
-static const u32 lit_1602[5] = {
+static const u32 lit_1734[5] = {
     0x00000044, 0x00000046, 0x00000048, 0x0000004A, 0x0000004C, 
 };
-static const char lit_1849[14] = "float cancel\n";
+static const char lit_1981[14] = "float cancel\n";
 #pragma force_active off
 extern void HSD_JObjAnimAll(HSD_JObj *joint);
 
@@ -1819,17 +2063,17 @@ void ZoidDash1(ZoidState *zoid)
     }
 }
 #pragma force_active on
-static const f32 lit_1494[1] = { -1.0f };
-static const f32 lit_1519[1] = { 0.026179938f };
-static const f32 lit_1520[1] = { 0.5235988f };
-static const f32 lit_1521[1] = { 15.0f };
-static const f64 lit_1572[1] = { 10.0 };
-static const f32 lit_1651[1] = { 3.761582e-37f };
-static const f32 lit_1845[1] = { 0.08726646f };
-static const f32 lit_1846[1] = { 5.0f };
-static const f32 lit_1847[1] = { 2.0f };
-static const f32 lit_1848[1] = { 10000.0f };
-static const f32 lit_1850[1] = { 0.9f };
+static const f32 lit_1626[1] = { -1.0f };
+static const f32 lit_1651[1] = { 0.026179938f };
+static const f32 lit_1652[1] = { 0.5235988f };
+static const f32 lit_1653[1] = { 15.0f };
+static const f64 lit_1704[1] = { 10.0 };
+static const f32 lit_1783[1] = { 3.761582e-37f };
+static const f32 lit_1977[1] = { 0.08726646f };
+static const f32 lit_1978[1] = { 5.0f };
+static const f32 lit_1979[1] = { 2.0f };
+static const f32 lit_1980[1] = { 10000.0f };
+static const f32 lit_1982[1] = { 0.9f };
 #pragma force_active off
 void stepMove(ZoidState *zoid)
 {
@@ -2013,6 +2257,74 @@ void ZoidActStep(ZoidState *zoid)
         zoid->field_1C74 = 0.0f;
     }
 }
+void ZoidActStepF(ZoidState *zoid)
+{
+    s32 busy;
+    u8 *slider;
+    s32 voice;
+    s32 tblA[4] = { 25, 29, 33, 37 };
+    s32 tblB[4] = { 26, 30, 34, 38 };
+    s32 tblC[4] = { 27, 31, 35, 39 };
+    s32 tblD[4] = { 28, 32, 36, 40 };
+    StepControlData *control;
+
+    busy = 0;
+    slider = (u8 *)zoid->slider_info;
+    control = (StepControlData *)zoid->anim_data;
+    if (slider != 0) {
+        if (zoid->requested_action == 0x17)
+            busy = 1;
+        if (zoid->requested_action == 0x18)
+            busy = 1;
+        if (zoid->requested_action == 0x19)
+            busy = 1;
+        if (zoid->requested_action == 0x1a)
+            busy = 1;
+        if (zoid->requested_action == 0x2d)
+            busy = 1;
+        if (zoid->requested_action == 0x2e)
+            busy = 1;
+        if (zoid->requested_action == 0x2f)
+            busy = 1;
+        if (zoid->requested_action == 0x30)
+            busy = 1;
+        if (busy != 0)
+            zoid->requested_action = 0;
+        if (zoid->action_phase >= 0x10 && zoid->action_phase < 0x30)
+            ZoidSusumuStepVF(zoid);
+        zoid->position[0] += zoid->field_1C90[2] * wsinf(zoid->heading);
+        zoid->position[2] += zoid->field_1C90[2] * wcosf(zoid->heading);
+        switch (zoid->action_phase) {
+        case 0:
+            zoid->field_1DBC |= 1;
+            ZoidSetAnim(zoid, tblA[zoid->action - 0x17]);
+            zoid->action_phase = 0x10;
+            voice = 1;
+            if (GameMode.game_type == 1 || GameMode.game_type == 4) {
+                if (zoid->slot != Zoid[0].slot)
+                    voice = 0;
+                if (zoid == &Zoid[2])
+                    voice = 0;
+            }
+            if (voice != 0)
+                zdVoiceScG(zoid, 0x1c);
+            break;
+        case 0x10:
+            if (zoid->animation_stopped == 0 && zoid->animation_looped == 0)
+                break;
+            ZoidSetAnim(zoid, tblB[zoid->action - 0x17]);
+            zoid->action_phase = 0x30;
+            break;
+        case 0x30:
+            if (zoid->animation_stopped == 0 && zoid->animation_looped == 0)
+                break;
+        default:
+            zdChgNormal(zoid);
+            break;
+        }
+        zoid->field_1C74 = 0.0f;
+    }
+}
 extern void PartnerFace(s32 face, s32 frames);
 
 void ZoidActDmg2(ZoidState *zoid)
@@ -2141,7 +2453,7 @@ void ZoidActDmg3(ZoidState *zoid)
     case 16:
         ZoidSetAnim(zoid, 56);
         zoid->action_phase = 17;
-        zoid->position[1] = zoid->position[1] + lit_1572[0] * (0.4 * ((f32)control->f158 / 100.0));
+        zoid->position[1] = zoid->position[1] + lit_1704[0] * (0.4 * ((f32)control->f158 / 100.0));
         zoid->grounded = 0;
         if (control->f158 == 0) {
             zoid->action_phase = 32;
@@ -2505,8 +2817,8 @@ void ZoidActDeath(ZoidState *zoid)
     zdSetXYZ(zoid);
     zoid->action = 0x33;
 }
-#undef lit_2197
-#define lit_2197 "geneX=%d geneZ=%d \n"
+#undef lit_2379
+#define lit_2379 "geneX=%d geneZ=%d \n"
 #pragma push
 #pragma auto_inline off
 
@@ -2549,10 +2861,10 @@ void ZoidActWin(ZoidState *zoid)
     zoid->field_1C34 = 0;
 }
 #pragma pop
-#undef lit_2218
-#define lit_2218 "mot-Win\n"
+#undef lit_2400
+#define lit_2400 "mot-Win\n"
 #pragma force_active on
-static const char lit_2285[9] = "foot=%X\n";
+static const char lit_2467[9] = "foot=%X\n";
 #pragma force_active off
 #pragma push
 #pragma auto_inline off
@@ -2615,6 +2927,10 @@ void dmgZoid(ZoidState *zoid)
     }
 }
 #pragma pop
+#pragma force_active on
+static const f32 lit_2477[1] = { -1.5707963f };
+static const f32 lit_2478[1] = { 1.5707963f };
+#pragma force_active off
 #pragma push
 #pragma auto_inline off
 void zdZuri(ZoidState *zoid)
@@ -2645,6 +2961,7 @@ void ZoidMove(ZoidState *zoid)
     f32 knockback_length;
     f32 magnitude2;
     f32 magnitude3;
+    f32 scale;
     f32 length;
     f32 sum;
     f32 v;
@@ -2908,7 +3225,11 @@ void ZoidMove(ZoidState *zoid)
         case 25:
         case 26:
             zoid->field_1C34 = 1;
-            ZoidActStep(zoid);
+            if (control != 0 && *(s32 *)(control + 0xF8) == 3) {
+                ZoidActStepF(zoid);
+            } else {
+                ZoidActStep(zoid);
+            }
             break;
         case 27:
         case 28:
@@ -3072,8 +3393,22 @@ void ZoidMove(ZoidState *zoid)
                 zoid->action = 0;
                 break;
             }
-            zoid->launch_velocity[0] = zoid->displacement[0] + sinf(step);
-            zoid->launch_velocity[2] = zoid->displacement[2] + cosf(step);
+            if (*(s32 *)(control + 0xF8) == 3) {
+                scale = (f32) * (s32 *)(control + 0xD0) / 40.0;
+                if (zoid->requested_action == 25) {
+                    step = lit_2478[0];
+                }
+                if (zoid->requested_action == 26) {
+                    step = lit_2477[0];
+                }
+                zoid->launch_velocity[0] = scale * sinf(step);
+                zoid->launch_velocity[2] = scale * cosf(step);
+                ((f32 *)zoid->us_pad_1C2C)[0] = scale * sinf(step);
+                ((f32 *)zoid->us_pad_1C2C)[2] = scale * cosf(step);
+            } else {
+                zoid->launch_velocity[0] = zoid->displacement[0] + sinf(step);
+                zoid->launch_velocity[2] = zoid->displacement[2] + cosf(step);
+            }
         case 45:
         case 46:
         case 47:
@@ -3094,7 +3429,7 @@ void ZoidMove(ZoidState *zoid)
             if (zoid->launch_velocity[1] > 1.0f) {
                 zoid->launch_velocity[1] = 1.0f;
             }
-            if (zoid->ground_polygon != GROUND_POLYGON_NONE) {
+            if (*(s32 *)(control + 0xF8) != 3 && zoid->ground_polygon != GROUND_POLYGON_NONE) {
                 index = grdcPolygon[zoid->ground_polygon].normal_index;
                 normal = &grdcNormal[index];
                 zoid->launch_velocity[0] += normal->x;
@@ -3166,9 +3501,9 @@ void ZoidMove(ZoidState *zoid)
         case 34:
             length = sLenPoint3dR(zoid->knockback);
             if (length > 0.22) {
-                zoid->knockback[0] = lit_1847[0] * (zoid->knockback[0] / length);
-                zoid->knockback[1] = lit_1847[0] * (zoid->knockback[1] / length);
-                zoid->knockback[2] = lit_1847[0] * (zoid->knockback[2] / length);
+                zoid->knockback[0] = lit_1979[0] * (zoid->knockback[0] / length);
+                zoid->knockback[1] = lit_1979[0] * (zoid->knockback[1] / length);
+                zoid->knockback[2] = lit_1979[0] * (zoid->knockback[2] / length);
             }
             zoid->knockback[1] = 0.4 *((f32) * (s32 *)(table + 0x158) / 100.0);
             if (absf(zoid->knockback[1]) >= absf(zoid->knockback[0])
@@ -3209,10 +3544,10 @@ void ZoidMove(ZoidState *zoid)
                 sum += v * v;
             }
             sum = square_root(sum);
-            if (sum > lit_1847[0]) {
+            if (sum > lit_1979[0]) {
                 for (j = 0; j < 3; j++) {
                     v = zoid->knockback[j];
-                    zoid->launch_velocity[j] = lit_1847[0] * v / sum;
+                    zoid->launch_velocity[j] = lit_1979[0] * v / sum;
                 }
             }
             v = (f32) * (s32 *)(table + 0x158) * (f32) * (s32 *)(table + 0x158) / 100.0 / 100.0;
@@ -3293,7 +3628,7 @@ void zdCalcRot(ZoidState *zoid)
         if (diff < -DEG(60)) {
             turn_right = 1;
         }
-        if (diff > lit_848[0]) {
+        if (diff > lit_859[0]) {
             turn_left = 1;
         }
         if (*(s32 *)((u8 *)zoid->ai + 0x40) != 0) {
@@ -3621,11 +3956,11 @@ s32 zdAtkSub(ZoidState *zoid)
     f32 distance;
 
     if (zoid != (void *)0 && zoid->joint != (void *)0 && zoid->attack_target <= -1) {
-        best = lit_1494[0];
+        best = lit_1626[0];
         for (i = 0; i < 16; i++) {
             target = &Zoid[i];
             if (target->joint != (void *)0 && target->stel_state != 2 && zoid->attack_in_range[i] != 0 && !((d = zoid->distances[i]) <= 0.0f)) {
-                if (lit_1494[0] == best || distance > d) {
+                if (lit_1626[0] == best || distance > d) {
                     distance = zoid->distances[i];
                     best = i;
                 }
@@ -3645,13 +3980,13 @@ void zdAtkSubFor(ZoidState *zoid, s32 attack)
 
     if (zoid != (void *)0 && zoid->joint != (void *)0) {
         if (zoid->attack_target != -1 && zoid->attack_target != -2 && zoid->action_phase != 3) {
-            limit = lit_1519[0];
+            limit = lit_1651[0];
             if (zoid->action_phase == 0) {
-                limit = lit_1520[0];
+                limit = lit_1652[0];
             }
             target = &Zoid[zoid->attack_target];
             if (target->joint != (void *)0 &&
-                (zoid->action_phase == 0 || !(sLenJobj(zoid->joint->child, target->joint->child) < lit_1521[0]))) {
+                (zoid->action_phase == 0 || !(sLenJobj(zoid->joint->child, target->joint->child) < lit_1653[0]))) {
                 angle = ZoidCalcAngle(zoid, (Vec3 *)target->position);
                 if (angle > limit) {
                     angle = limit;
@@ -3716,14 +4051,14 @@ void zdAtkSubForPull(ZoidState *zoid, s32 attack)
             if (zoid->ground_turn != 0) {
                 return;
             }
-            if (*(s16 *)((u8 *)Tea_zoiddat + zoid->type * 0x7E8 + attack * 2 + 0x75A) == 0) {
+            if (*(s16 *)((u8 *)Tea_zoiddat + zoid->type * 0x7FC + attack * 2 + 0x76E) == 0) {
                 return;
             }
-            range = *(s16 *)((u8 *)Tea_zoiddat + zoid->type * 0x7E8 + attack * 2 + 0x6B2);
+            range = *(s16 *)((u8 *)Tea_zoiddat + zoid->type * 0x7FC + attack * 2 + 0x6C6);
             if (0.0f == range) {
                 return;
             }
-            range = range + (f32)*(s32 *)(data + 0x2e4) / lit_1572[0];
+            range = range + (f32)*(s32 *)(data + 0x2e4) / lit_1704[0];
             if (0.0f == range) {
                 return;
             }
@@ -3830,8 +4165,8 @@ extern void zdVoiceScG(ZoidState *zoid, s32 voice);
 
 void ZoidActAtack(ZoidState *zoid)
 {
-    AtkTbl5 tblA = *(const AtkTbl5 *)lit_1601;
-    AtkTbl5 tblB = *(const AtkTbl5 *)lit_1602;
+    AtkTbl5 tblA = *(const AtkTbl5 *)lit_1733;
+    AtkTbl5 tblB = *(const AtkTbl5 *)lit_1734;
     f32 saved[3];
     f32 pos[3];
     GroundMask mask;
@@ -3878,10 +4213,10 @@ void ZoidActAtack(ZoidState *zoid)
     slider = slider;
     busy = busy;
     flags = flags;
-    zoid->face_yaw = beSide(zoid->face_yaw, 0.0f, lit_1845[0]);
-    zoid->face_pitch = beSide(zoid->face_pitch, 0.0f, lit_1845[0]);
-    zoid->senter_roll = beSide(zoid->senter_roll, 0.0f, lit_1845[0]);
-    zoid->f_base_ry = beSide(zoid->f_base_ry, 0.0f, lit_1845[0]);
+    zoid->face_yaw = beSide(zoid->face_yaw, 0.0f, lit_1977[0]);
+    zoid->face_pitch = beSide(zoid->face_pitch, 0.0f, lit_1977[0]);
+    zoid->senter_roll = beSide(zoid->senter_roll, 0.0f, lit_1977[0]);
+    zoid->f_base_ry = beSide(zoid->f_base_ry, 0.0f, lit_1977[0]);
     ZoidSisei(zoid);
     if (zoid->action_phase == 0)
         zoid->attack_target = -1;
@@ -3907,11 +4242,11 @@ void ZoidActAtack(ZoidState *zoid)
             zoid->ground_turn = 0;
         }
         ok = 1;
-        dist = lit_1846[0];
+        dist = lit_1978[0];
         if (slider[0x70b] & 2) {
             dist = range;
-            if (dist < lit_1846[0])
-                dist = lit_1846[0];
+            if (dist < lit_1978[0])
+                dist = lit_1978[0];
         }
         if (zdFaceAtk(zoid, dist, 0.0f) != 0)
             ok = 0;
@@ -3919,12 +4254,12 @@ void ZoidActAtack(ZoidState *zoid)
             ok = 0;
         if (zdGoYA(zoid, 0.0f, 1.0f) > 1.0f)
             ok = 0;
-        if (zdGoYA(zoid, 0.0f, lit_1847[0]) > 1.0f)
+        if (zdGoYA(zoid, 0.0f, lit_1979[0]) > 1.0f)
             ok = 0;
-        if (zdGoYA(zoid, 0.0f, lit_1846[0]) > 1.0f)
+        if (zdGoYA(zoid, 0.0f, lit_1978[0]) > 1.0f)
             ok = 0;
         if (zoid->action != 0xd && zoid->attack_target != -1) {
-            if (sColPtJobj((u8 *)zoid->camera_joint, (u8 *)Zoid[zoid->attack_target].camera_joint, (mask = (tmp = *(const GroundMask *)lit_1651), &mask)) == *(const f32 *)lit_1848)
+            if (sColPtJobj((u8 *)zoid->camera_joint, (u8 *)Zoid[zoid->attack_target].camera_joint, (mask = (tmp = *(const GroundMask *)lit_1783), &mask)) == *(const f32 *)lit_1980)
                 ok = 1;
         }
         if (ok == 0) {
@@ -3950,7 +4285,7 @@ void ZoidActAtack(ZoidState *zoid)
         if (ok == 0) {
             coBakAtk(zoid);
             zoid->action_phase = 0x99;
-            OSReport(lit_1849);
+            OSReport(lit_1981);
             return;
         }
         zoid->gene_frames = 0;
@@ -4031,8 +4366,8 @@ void ZoidActAtack(ZoidState *zoid)
             zoid->displacement[0] = 0.0f;
             zoid->displacement[2] = 0.0f;
             if (zoid->displacement[1] > 0.0f)
-                zoid->displacement[1] = lit_1850[0];
-            zoid->displacement[1] = lit_1850[0];
+                zoid->displacement[1] = lit_1982[0];
+            zoid->displacement[1] = lit_1982[0];
             zoid->action_phase = 0x13;
         } else {
             ZoidInertiaAtk(zoid);
@@ -4042,7 +4377,7 @@ void ZoidActAtack(ZoidState *zoid)
     case 1:
         if (camera != 0)
             *(s32 *)(camera + 0x34) = 600;
-        if (range > lit_1847[0]) {
+        if (range > lit_1979[0]) {
             grounded = 1;
             flags = slider[0x70e];
             if (zoid->grounded == 0)

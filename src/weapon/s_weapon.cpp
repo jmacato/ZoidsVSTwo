@@ -40,7 +40,9 @@ typedef struct ZoidState {
     s32 camera_joint;
     u8 pad_19C8[0x1B68 - 0x19C8];
     f32 position[3];
-    u8 pad_1B74[0x1D46 - 0x1B74];
+    u8 pad_1B74[0x1C2C - 0x1B74];
+    u8 us_pad_1C2C[0xC];
+    u8 pad_1B74_us[0x1D46 - 0x1C2C];
     u16 enemy_smoke_timer;
     u8 pad_1D48[0x1D64 - 0x1D48];
     s32 death_started;

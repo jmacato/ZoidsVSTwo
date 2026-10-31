@@ -278,7 +278,9 @@ extern f32 cosf(f32 angle);
 typedef struct ZoidState {
     char name[0x40];
     void *joint;
-    u8 pad044[0x1de0 - 0x44];
+    u8 pad044[0x1C2C - 0x44];
+    u8 us_pad_1C2C[0xC];
+    u8 pad044_us[0x1DE0 - 0x1C2C];
     f32 distances[16];
     u8 pad1e20[0x1f8c - 0x1e20];
 } ZoidState;
@@ -881,8 +883,6 @@ s32 TEA_mcMountNoFormat(s32 slot)
 }
 #undef lit_702
 #define lit_702 "\t\x8f" "C\x95\x9c" "2\x8e\xb8\x94s. (%d)\n"
-#undef lit_703
-#define lit_703 "\x80\x02" "B\xb4\x80\x02" "B\xc8\x80\x02" "B\xc8\x80\x02" "B\xc8\x80\x02" "B\xc8\x80\x02" "B\xc8\x80\x02" "B\xc8\x80\x02" "B\xb4\x80\x02" "B\xa0\x80\x02" "B\xc8\x80\x02" "A\xf8\x80\x02" "B\xa0\x80\x02" "B\xc8\x80\x02" "B"
 #pragma force_active on
 static const char lit_744[18] = "\t\x8f" "C\x95\x9c" "3\x8e\xb8\x94s. (%d)\n";
 #pragma force_active off
@@ -1006,7 +1006,7 @@ s32 TEA_mcMountNoChkError(s32 slot)
 static const char lit_830[16] = "Memcard EncErr\n";
 static const char lit_831[20] = "Memcard EncErr1End\n";
 #pragma force_active off
-namespace { extern const char lit_846[1]; }
+namespace { extern const char lit_856[1]; }
 s32 TEA_mcBadEncFormatEnc(s32 slot)
 {
     s64 limit;
@@ -1014,7 +1014,7 @@ s32 TEA_mcBadEncFormatEnc(s32 slot)
     limit = OSGetTime() / (OS_BUS_CLOCK / 4) + 60;
     menudispyesnopoint = 1;
     clrYesNoMsg();
-    menuYesNoSetStr(lit_846, GetMenuMsgAdr(0x476));
+    menuYesNoSetStr(lit_856, GetMenuMsgAdr(0x476));
     menudispyesnoflag = 1;
     while (1) {
         sPadAll();
@@ -1023,13 +1023,31 @@ s32 TEA_mcBadEncFormatEnc(s32 slot)
             clrYesNoMsg();
             return 0;
         }
-        menudispyesnopoint = menuYesNo(menudispyesnopoint, lit_846, GetMenuMsgAdr(0x476));
+        menudispyesnopoint = menuYesNo(menudispyesnopoint, lit_856, GetMenuMsgAdr(0x476));
         if (sPad1->pressed_a != 0) {
             break;
         }
     }
-    clrYesNoMsg();
     SeRet();
+    puts("[SLOT CHK NEW] format\x8a\x6d\x94\x46\x8f\x49\x97\xb9\x81\x41\x81\x41");
+    if (menudispyesnopoint == 1) {
+        puts("[SLOT CHK NEW] format\x8a\x6d\x94\x46OK\x81\x41\x81\x41");
+        while (1) {
+            sPadAll();
+            menu_sDispStartYesNo();
+            if (TEA_mcChkSlot(slot) == 0) {
+                clrYesNoMsg();
+                return 0;
+            }
+            menudispyesnopoint = menuYesNo(menudispyesnopoint, lit_856, GetMenuMsgAdr(0x438));
+            if (sPad1->pressed_a != 0) {
+                break;
+            }
+        }
+        SeRet();
+    }
+    puts("[SLOT CHK NEW] format\x8d\xc4\x8a\x6d\x94\x46 \x8f\x49\x97\xb9\x81\x41\x81\x41");
+    clrYesNoMsg();
     if (menudispyesnopoint == 1) {
         menudispyesnopoint = 1;
         clrYesNoMsg();
@@ -1050,10 +1068,16 @@ s32 TEA_mcBadEncFormatEnc(s32 slot)
     }
     return 0;
 }
-#undef lit_847
-#define lit_847 "MemCard FormatOk \n"
+#undef lit_857
+#define lit_857 "[SLOT CHK NEW] format\x8am\x94" "F\x8fI\x97\xb9\x81" "A\x81" "A"
+#undef lit_858
+#define lit_858 "[SLOT CHK NEW] format\x8am\x94" "FOK\x81" "A\x81" "A"
+#undef lit_859
+#define lit_859 "[SLOT CHK NEW] format\x8d\xc4\x8am\x94" "F \x8fI\x97\xb9\x81" "A\x81" "A"
+#undef lit_860
+#define lit_860 "MemCard FormatOk \n"
 #pragma force_active on
-static const char lit_869[29] = "MemCard \x8eg\x97p\x82\xc5\x82\xab\x82\xc8\x82\xa2\x83J\x81[\x83h \n";
+static const char lit_882[29] = "MemCard \x8eg\x97p\x82\xc5\x82\xab\x82\xc8\x82\xa2\x83J\x81[\x83h \n";
 #pragma force_active off
 s32 TEA_mcError(s32 slot, s32 err)
 {
@@ -1078,15 +1102,15 @@ s32 TEA_mcError(s32 slot, s32 err)
     }
     return 1;
 }
-#undef lit_877
-#define lit_877 "MemCard%d mcerrIO\x83G\x83\x89\x81[ \n"
-#undef lit_878
-#define lit_878 "MemCard%d mcerr\x83\x81\x83\x82\x83\x8a\x83J\x81[\x83h\x82\xc5\x82\xc8\x82\xa2 \n"
-#undef lit_879
-#define lit_879 "MemCard%d mcerr\x94j\x89\xf3\n"
+#undef lit_890
+#define lit_890 "MemCard%d mcerrIO\x83G\x83\x89\x81[ \n"
+#undef lit_891
+#define lit_891 "MemCard%d mcerr\x83\x81\x83\x82\x83\x8a\x83J\x81[\x83h\x82\xc5\x82\xc8\x82\xa2 \n"
+#undef lit_892
+#define lit_892 "MemCard%d mcerr\x94j\x89\xf3\n"
 #pragma force_active on
-static const char lit_901[33] = "MemCard freesize=%d freedir=%d \n";
-static const char lit_911[19] = "\tLeave StartCheck\n";
+static const char lit_914[33] = "MemCard freesize=%d freedir=%d \n";
+static const char lit_924[19] = "\tLeave StartCheck\n";
 #pragma force_active off
 s32 TEA_mcFormat(s32 slot)
 {
@@ -1119,14 +1143,14 @@ s32 TEA_mcFormat(s32 slot)
     (void)n;
     return 1;
 }
-#undef lit_926
-#define lit_926 "CARD Format :"
-#undef lit_927
-#define lit_927 "\t\x8f\x89\x8a\xfa\x89\xbb\x8e\xb8\x94s 1st . (%d)\n"
-#undef lit_928
-#define lit_928 "\t\x8f\x89\x8a\xfa\x89\xbb\x8e\xb8\x94s 2nd . (%d)\n"
-#undef lit_929
-#define lit_929 "\t\x8f\x89\x8a\xfa\x89\xbb done. (%d)\n"
+#undef lit_939
+#define lit_939 "CARD Format :"
+#undef lit_940
+#define lit_940 "\t\x8f\x89\x8a\xfa\x89\xbb\x8e\xb8\x94s 1st . (%d)\n"
+#undef lit_941
+#define lit_941 "\t\x8f\x89\x8a\xfa\x89\xbb\x8e\xb8\x94s 2nd . (%d)\n"
+#undef lit_942
+#define lit_942 "\t\x8f\x89\x8a\xfa\x89\xbb done. (%d)\n"
 s32 TEA_mcFileStatus(s32 slot, s32 fileNo)
 {
     s32 err = 0;
@@ -1145,28 +1169,28 @@ s32 TEA_mcFileStatus(s32 slot, s32 fileNo)
     OSReport("\tFreeSize:%d FreeDir:%d \n", MemCardFreeSize, MemCardFreeDir);
     return 1;
 }
-#undef lit_933
-#define lit_933 "GetStatus \n"
-#undef lit_934
-#define lit_934 "failed. (%d)\n"
-#undef lit_935
-#define lit_935 "\tGameName:%.4s Company:%.2s Fno:%d\n"
-#undef lit_936
-#define lit_936 "\tSaveSize:%d Time:%d \n"
-#undef lit_937
-#define lit_937 "\tfileName[%.32s] MSG[ADR=%d] \n"
-#undef lit_938
-#define lit_938 "\tFreeSize:%d FreeDir:%d \n"
+#undef lit_946
+#define lit_946 "GetStatus \n"
+#undef lit_947
+#define lit_947 "failed. (%d)\n"
+#undef lit_948
+#define lit_948 "\tGameName:%.4s Company:%.2s Fno:%d\n"
+#undef lit_949
+#define lit_949 "\tSaveSize:%d Time:%d \n"
+#undef lit_950
+#define lit_950 "\tfileName[%.32s] MSG[ADR=%d] \n"
+#undef lit_951
+#define lit_951 "\tFreeSize:%d FreeDir:%d \n"
 #pragma force_active on
-static const char lit_959[35] = "\tCARDGetSectorSize() failed. (%d)\n";
-static const char lit_960[17] = "File:%s Delete \n";
-static const char lit_961[18] = "MemCard \x8d\xec\x90\xac 1st\t";
-static const char lit_962[18] = "done. (%d:%d:%d)\n";
-static const char lit_963[21] = "TypeStart\n%sTypeEnd\n";
-static const char lit_964[53] = "CARDWriteSize \x83" "f\x81[\x83^\x83T\x83" "C\x83Y%dByte \x83Z\x81[\x83u\x83T\x83" "C\x83Y%dByte\n";
-static const char lit_965[23] = "\x83\x81\x83\x82\x83\x8a\x93]\x91\x97 %d Byte %x\n";
-static const char lit_966[15] = "CARD CLOSE OK\n";
-static const char lit_967[19] = "CARD \x83\x81\x83\x82\x83\x8a\x8aJ\x95\xfaOK\n";
+static const char lit_972[35] = "\tCARDGetSectorSize() failed. (%d)\n";
+static const char lit_973[17] = "File:%s Delete \n";
+static const char lit_974[18] = "MemCard \x8d\xec\x90\xac 1st\t";
+static const char lit_975[18] = "done. (%d:%d:%d)\n";
+static const char lit_976[21] = "TypeStart\n%sTypeEnd\n";
+static const char lit_977[53] = "CARDWriteSize \x83" "f\x81[\x83^\x83T\x83" "C\x83Y%dByte \x83Z\x81[\x83u\x83T\x83" "C\x83Y%dByte\n";
+static const char lit_978[23] = "\x83\x81\x83\x82\x83\x8a\x93]\x91\x97 %d Byte %x\n";
+static const char lit_979[15] = "CARD CLOSE OK\n";
+static const char lit_980[19] = "CARD \x83\x81\x83\x82\x83\x8a\x8aJ\x95\xfaOK\n";
 #pragma force_active off
 s32 TEA_mcFileWrite(s32 slot, void *buf, s32 len)
 {
@@ -1213,21 +1237,21 @@ s32 TEA_mcFileWrite(s32 slot, void *buf, s32 len)
     }
     return 1;
 }
-#undef lit_985
-#define lit_985 "CARDWrite %dByte SaveSize=%d \n"
-#undef lit_986
-#define lit_986 "failedwrite_a. (%d)\n"
-#undef lit_987
-#define lit_987 "\tWriteByte(%8d)\n"
-#undef lit_988
-#define lit_988 "failedwrite_b. (%d)\n"
-#undef lit_989
-#define lit_989 "done. (%d)\n"
+#undef lit_998
+#define lit_998 "CARDWrite %dByte SaveSize=%d \n"
+#undef lit_999
+#define lit_999 "failedwrite_a. (%d)\n"
+#undef lit_1000
+#define lit_1000 "\tWriteByte(%8d)\n"
+#undef lit_1001
+#define lit_1001 "failedwrite_b. (%d)\n"
+#undef lit_1002
+#define lit_1002 "done. (%d)\n"
 #pragma force_active on
 static const char lit_449[5] = ".ptl";
 static const char lit_450[5] = ".txg";
 static const char lit_451[5] = ".ref";
-namespace { __declspec(section ".sdata2") extern const char lit_846[1] = ""; }
+namespace { __declspec(section ".sdata2") extern const char lit_856[1] = ""; }
 #pragma force_active off
 s32 TEA_mcFileOpen(s32 slot, char *name)
 {
@@ -1265,31 +1289,66 @@ s32 TEA_mcFileOpen(s32 slot, char *name)
     }
     return 1;
 }
-#undef lit_1007
-#define lit_1007 "MemCardOpen\t%s "
-#undef lit_1008
-#define lit_1008 "FileOpen failed. (%d)\n"
-#undef lit_1009
-#define lit_1009 "Done\n"
-#undef lit_1010
-#define lit_1010 "MemCard SLOT \x96\xb3\x82\xb5" "2 %d On[%d]"
+#undef lit_1020
+#define lit_1020 "MemCardOpen\t%s "
+#undef lit_1021
+#define lit_1021 "FileOpen failed. (%d)\n"
+#undef lit_1022
+#define lit_1022 "Done\n"
+#undef lit_1023
+#define lit_1023 "MemCard SLOT \x96\xb3\x82\xb5" "2 %d On[%d]"
 #pragma force_active on
-static const char lit_1024[14] = "MemCardClose\t";
-static const char lit_1037[9] = "\xa5\xa5" "Busy\xa5\xa5";
-static const char lit_1072[25] = "\t\x83\x81\x83\x82\x83\x8a\x81[SizeErr1:%d %x\n";
-static const char lit_1073[25] = "\t\x83\x81\x83\x82\x83\x8a\x81[SizeErr2:%d %x\n";
-static const char lit_1074[28] = "MemCardRead %dByte %dByte \n";
-static const char lit_1075[21] = "\t\x83\x81\x83\x82\x83\x8a\x81[\x8am\x95\xdb:%d %x\n";
-static const char lit_1076[19] = "Read:failed. (%d)\n";
-static const char lit_1077[15] = "\tReadByte(%d)\n";
-static const char lit_1078[15] = "failedB. (%d)\n";
-static const char lit_1079[20] = "done. (%d) %d Byte\n";
-static const char lit_1080[28] = "\t\x83\x81\x83\x82\x83\x8a\x81[ReadSizeErr:%d %x\n";
+static const char lit_1037[14] = "MemCardClose\t";
 #pragma force_active off
-namespace { extern const char lit_846[1]; }
+s32 TEA_mcFileDel(void)
+{
+    s32 retry = 0;
+    s32 slot = MemcardNowSlot;
+    s64 time = OSGetTime() / (OS_BUS_CLOCK / 4) + 60;
+    s32 result;
+
+    strcpy(menusaveloadfilename, MC_FILENAME_MSG);
+    OSReport("MemCardDel\t%s ", menusaveloadfilename);
+    for (;;) {
+        result = CARDDelete(slot, menusaveloadfilename);
+        if (result == 0) {
+            break;
+        }
+        retry++;
+        if (retry < 10) {
+            continue;
+        }
+        OSReport("FileDel failed. (%d)\n", result);
+        if (result == -1) {
+            continue;
+        }
+        if (result == -10) {
+            return 0;
+        }
+        return 0;
+    }
+    return 1;
+}
+#undef lit_1051
+#define lit_1051 "MemCardDel\t%s "
+#undef lit_1052
+#define lit_1052 "FileDel failed. (%d)\n"
+#pragma force_active on
+static const char lit_1065[9] = "\xa5\xa5" "Busy\xa5\xa5";
+static const char lit_1100[25] = "\t\x83\x81\x83\x82\x83\x8a\x81[SizeErr1:%d %x\n";
+static const char lit_1101[25] = "\t\x83\x81\x83\x82\x83\x8a\x81[SizeErr2:%d %x\n";
+static const char lit_1102[28] = "MemCardRead %dByte %dByte \n";
+static const char lit_1103[21] = "\t\x83\x81\x83\x82\x83\x8a\x81[\x8am\x95\xdb:%d %x\n";
+static const char lit_1104[19] = "Read:failed. (%d)\n";
+static const char lit_1105[15] = "\tReadByte(%d)\n";
+static const char lit_1106[15] = "failedB. (%d)\n";
+static const char lit_1107[20] = "done. (%d) %d Byte\n";
+static const char lit_1108[28] = "\t\x83\x81\x83\x82\x83\x8a\x81[ReadSizeErr:%d %x\n";
+#pragma force_active off
+namespace { extern const char lit_856[1]; }
 void LoadIconC8(u8 *area, CARDStat *stat)
 {
-    const char *names[3] = {"/etc/zoidvs.tga", "/etc/ci.tpl", lit_846};
+    const char *names[3] = {"/etc/zoidvs.tga", "/etc/ci.tpl", lit_856};
     u8 buf[0x640];
     u32 unused;
     s8 tmp[0x800];
@@ -1306,7 +1365,7 @@ void LoadIconC8(u8 *area, CARDStat *stat)
     stat->iconFormat = (stat->iconFormat & ~3) | 1;
     stat->iconSpeed = (stat->iconSpeed & ~3) | 3;
     stat->iconSpeed = (stat->iconSpeed & ~0xC) | 0;
-    memcpy(buf, "\x83]\x83" "C\x83h\x83o\x81[\x83T\x83X\x87U                                 ", 0x20);
+    memcpy(buf, "ZOIDS BATTLE LEGENDS                             ", 0x20);
     strcpy((char *)tmp, menusaveloadcommentname);
     memcpy(buf + 0x20, tmp, 0x20);
     for (i = 0; i < 0x800; i++) {
@@ -1343,34 +1402,34 @@ void LoadIconC8(u8 *area, CARDStat *stat)
     memcpy(area, buf, 0x640);
     OSReport("Status set\x8f\x80\x94\xf5 memcpy\n");
 }
-#undef lit_1084
-#define lit_1084 "/etc/zoidvs.tga"
-#undef lit_1085
-#define lit_1085 "/etc/ci.tpl"
-#undef lit_1111
-#define lit_1111 "Memcpy St\n"
 #undef lit_1112
-#define lit_1112 "\x83]\x83" "C\x83h\x83o\x81[\x83T\x83X\x87U                                 "
+#define lit_1112 "/etc/zoidvs.tga"
 #undef lit_1113
-#define lit_1113 "ICON NO IMG\n"
-#undef lit_1114
-#define lit_1114 "CLUT ERR\n"
-#undef lit_1115
-#define lit_1115 "CLUT OK\n"
-#undef lit_1116
-#define lit_1116 "ICON NO CLUT\n"
-#undef lit_1117
-#define lit_1117 "Status set\x8f\x80\x94\xf5 memcpy\n"
+#define lit_1113 "/etc/ci.tpl"
+#undef lit_1139
+#define lit_1139 "Memcpy St\n"
+#undef lit_1140
+#define lit_1140 "ZOIDS BATTLE LEGENDS                             "
+#undef lit_1141
+#define lit_1141 "ICON NO IMG\n"
+#undef lit_1142
+#define lit_1142 "CLUT ERR\n"
+#undef lit_1143
+#define lit_1143 "CLUT OK\n"
+#undef lit_1144
+#define lit_1144 "ICON NO CLUT\n"
+#undef lit_1145
+#define lit_1145 "Status set\x8f\x80\x94\xf5 memcpy\n"
 #pragma force_active on
-static const char lit_1148[44] = "MemFile SaveSt slot=%d fname=[%s] iveno=%d\n";
-static const char lit_1195[75] = "Load1:End Stage=%d Mapno=%d Single=%d NowZoid=%d NowCust=%d \x90l\x95\xa8=%d \x8b\xe0=%d\n";
-static const char lit_1196[17] = "\x83\x81\x83\x82\x83J:File\x96\xb3\x82\xb5\n";
-static const char lit_1197[20] = "Zoid\x82\xcc\x83" "f\x81[\x83^\x82\xc5\x82\xc8\x82\xa2\n";
-static const char lit_1198[34] = "Zoid\x82\xcc\x83" "f\x81[\x83^\x81" "F\x83`\x83" "F\x83" "b\x83N\x83T\x83\x80\x83G\x83\x89\x81[\n";
-static const char lit_1273[37] = "Memcard MsgWaitPut:SLOT=%d MSGNO=%d\n";
-static const char lit_1300[47] = "Memcard MsgWaitPutNotSlotChk:SLOT=%d MSGNO=%d\n";
-static const char lit_1312[34] = "\x83\x81\x83\x82\x83JMSGOUT1 \x83X\x83\x8d\x83" "b\x83g\x96\xb3\x82\xb5 %d[%d]";
-static const char lit_1324[34] = "\x83\x81\x83\x82\x83JMSGOUT2 \x83X\x83\x8d\x83" "b\x83g\x96\xb3\x82\xb5 %d[%d]";
+static const char lit_1176[44] = "MemFile SaveSt slot=%d fname=[%s] iveno=%d\n";
+static const char lit_1223[75] = "Load1:End Stage=%d Mapno=%d Single=%d NowZoid=%d NowCust=%d \x90l\x95\xa8=%d \x8b\xe0=%d\n";
+static const char lit_1224[17] = "\x83\x81\x83\x82\x83J:File\x96\xb3\x82\xb5\n";
+static const char lit_1225[20] = "Zoid\x82\xcc\x83" "f\x81[\x83^\x82\xc5\x82\xc8\x82\xa2\n";
+static const char lit_1226[34] = "Zoid\x82\xcc\x83" "f\x81[\x83^\x81" "F\x83`\x83" "F\x83" "b\x83N\x83T\x83\x80\x83G\x83\x89\x81[\n";
+static const char lit_1301[37] = "Memcard MsgWaitPut:SLOT=%d MSGNO=%d\n";
+static const char lit_1328[47] = "Memcard MsgWaitPutNotSlotChk:SLOT=%d MSGNO=%d\n";
+static const char lit_1340[34] = "\x83\x81\x83\x82\x83JMSGOUT1 \x83X\x83\x8d\x83" "b\x83g\x96\xb3\x82\xb5 %d[%d]";
+static const char lit_1352[34] = "\x83\x81\x83\x82\x83JMSGOUT2 \x83X\x83\x8d\x83" "b\x83g\x96\xb3\x82\xb5 %d[%d]";
 #pragma force_active off
 s32 TEA_mcFileMake(s32 slot, s32 arg2, void *src, s32 size)
 {
@@ -1382,7 +1441,7 @@ s32 TEA_mcFileMake(s32 slot, s32 arg2, void *src, s32 size)
 
     limit = OSGetTime() / (OS_BUS_CLOCK / 4) + 60;
     u8 *area = (u8 *)MemCardAdr;
-    strcpy(menusaveloadcommentname, "\x83v\x83\x8c\x83" "C\x83" "f\x81[\x83^\x81@\x81@                                 ");
+    strcpy(menusaveloadcommentname, "Saved Data                                       ");
     strcpy(menusaveloadfilename, MC_FILENAME_MSG);
     MemcardNowSlot = slot;
     if (TEA_mcFileOpen(slot, menusaveloadfilename) == 0) {
@@ -1405,7 +1464,7 @@ s32 TEA_mcFileMake(s32 slot, s32 arg2, void *src, s32 size)
     MemCardLength = (size + 0x643 + MemCardSectorSize) & ~(MemCardSectorSize - 1);
     MemCardLength = 0x2000;
     memcpy(MemCardAdr, src, 0x1a90);
-    OSReport(lit_962, d0, MemCardFileInfo.chan, MemCardFileInfo.fileNo);
+    OSReport(lit_975, d0, MemCardFileInfo.chan, MemCardFileInfo.fileNo);
     if (TEA_mcFileWriteGather(slot, MemCardAdr, MemCardLength, arg2) == 0) {
         TEA_mcFileClose();
         puts("\x8f\x91\x82\xab\x83\x81\x83" "C\x83N\x83M\x83\x83\x83U\x8e\xb8\x94s");
@@ -1415,20 +1474,20 @@ s32 TEA_mcFileMake(s32 slot, s32 arg2, void *src, s32 size)
     slot = slot;
     return 1;
 }
-#undef lit_1348
-#define lit_1348 "\x83v\x83\x8c\x83" "C\x83" "f\x81[\x83^\x81@\x81@                                 "
-#undef lit_1349
-#define lit_1349 "MemCardFileMake\x96\xb3\x82\xb5 \x83t\x83@\x83" "C\x83\x8b\x83N\x83\x8a\x83G\x83" "C\x83g\x8aJ\x8en\n"
-#undef lit_1350
-#define lit_1350 "MemCardFileMake\x96\xb3\x82\xb5 \x83t\x83@\x83" "C\x83\x8b\x83N\x83\x8a\x83G\x83" "C\x83g\x8e\xb8\x94s\n"
-#undef lit_1351
-#define lit_1351 "MemCardFileICON\x8f\xee\x95\xf1\x90\xb6\x90\xac\x8e\xb8\x94s \n"
-#undef lit_1352
-#define lit_1352 "MemCardFileICON\x8f\xee\x95\xf1\x90\xb6\x90\xac \x90\xac\x8c\xf7 \n"
-#undef lit_1353
-#define lit_1353 "MemCardFileMake\x96\xb3\x82\xb5 \x83t\x83@\x83" "C\x83\x8b\x83N\x83\x8a\x83G\x83" "C\x83g\x8c\xe3\x81@\x8d\xc4\x83I\x81[\x83v\x83\x93\x8e\xb8\x94s\n"
-#undef lit_1354
-#define lit_1354 "\x8f\x91\x82\xab\x83\x81\x83" "C\x83N\x83M\x83\x83\x83U\x8e\xb8\x94s"
+#undef lit_1376
+#define lit_1376 "Saved Data                                       "
+#undef lit_1377
+#define lit_1377 "MemCardFileMake\x96\xb3\x82\xb5 \x83t\x83@\x83" "C\x83\x8b\x83N\x83\x8a\x83G\x83" "C\x83g\x8aJ\x8en\n"
+#undef lit_1378
+#define lit_1378 "MemCardFileMake\x96\xb3\x82\xb5 \x83t\x83@\x83" "C\x83\x8b\x83N\x83\x8a\x83G\x83" "C\x83g\x8e\xb8\x94s\n"
+#undef lit_1379
+#define lit_1379 "MemCardFileICON\x8f\xee\x95\xf1\x90\xb6\x90\xac\x8e\xb8\x94s \n"
+#undef lit_1380
+#define lit_1380 "MemCardFileICON\x8f\xee\x95\xf1\x90\xb6\x90\xac \x90\xac\x8c\xf7 \n"
+#undef lit_1381
+#define lit_1381 "MemCardFileMake\x96\xb3\x82\xb5 \x83t\x83@\x83" "C\x83\x8b\x83N\x83\x8a\x83G\x83" "C\x83g\x8c\xe3\x81@\x8d\xc4\x83I\x81[\x83v\x83\x93\x8e\xb8\x94s\n"
+#undef lit_1382
+#define lit_1382 "\x8f\x91\x82\xab\x83\x81\x83" "C\x83N\x83M\x83\x83\x83U\x8e\xb8\x94s"
 s32 TEA_mcFileMakeSystemIcon(s32 slot)
 {
     s32 s0 = 0;
@@ -1441,7 +1500,7 @@ s32 TEA_mcFileMakeSystemIcon(s32 slot)
     limit = OSGetTime() / (OS_BUS_CLOCK / 4) + 60;
     u8 *area = (u8 *)MemCardAdr;
     MemCardSectorSize = 0x2000;
-    strcpy(menusaveloadcommentname, "\x83v\x83\x8c\x83" "C\x83" "f\x81[\x83^\x81@\x81@                                 ");
+    strcpy(menusaveloadcommentname, "Saved Data                                       ");
     strcpy(menusaveloadfilename, MC_FILENAME_MSG);
     memcpy(area, IveSaveFlag, 0x1a90);
     MemcardNowSlot = slot;
@@ -1468,12 +1527,12 @@ s32 TEA_mcFileMakeSystemIcon(s32 slot)
     TEA_mcFileClose();
     return 1;
 }
-#undef lit_1362
-#define lit_1362 "CARDMakeIconSize \x83" "f\x81[\x83^\x83T\x83" "C\x83Y%dByte \x83Z\x81[\x83u\x83T\x83" "C\x83Y%dByte\n"
-#undef lit_1363
-#define lit_1363 "CARDMakeIconSize \x8e\xb8\x94s\n"
-#undef lit_1364
-#define lit_1364 "CARDMakeIconSize \x90\xac\x8c\xf7\n"
+#undef lit_1390
+#define lit_1390 "CARDMakeIconSize \x83" "f\x81[\x83^\x83T\x83" "C\x83Y%dByte \x83Z\x81[\x83u\x83T\x83" "C\x83Y%dByte\n"
+#undef lit_1391
+#define lit_1391 "CARDMakeIconSize \x8e\xb8\x94s\n"
+#undef lit_1392
+#define lit_1392 "CARDMakeIconSize \x90\xac\x8c\xf7\n"
 s32 TEA_mcFileWriteGather(s32 slot, void *buf, s32 len, s32 cnt)
 {
     s32 err = 0;
@@ -1511,14 +1570,14 @@ s32 TEA_mcFileWriteGather(s32 slot, void *buf, s32 len, s32 cnt)
         }
     }
     if (err < 0) {
-        OSReport(lit_934, err);
+        OSReport(lit_947, err);
         return 0;
     }
     OSReport("done. (%d)\n", err);
     return 1;
 }
-#undef lit_1380
-#define lit_1380 "CARDWriteG %dByte SaveSize=%d no=%d \n"
+#undef lit_1408
+#define lit_1408 "CARDWriteG %dByte SaveSize=%d no=%d \n"
 s32 TEA_mcFileReadGather(s32 slot, s32 cnt, void *dst)
 {
     s32 s0 = 0;
@@ -1557,13 +1616,13 @@ s32 TEA_mcFileReadGather(s32 slot, s32 cnt, void *dst)
         }
     }
     if (err < -1) {
-        OSReport(lit_1078, err);
+        OSReport(lit_1106, err);
         TEA_mcFileClose();
         return 0;
     }
     OSReport("done.RG (%d) %d Byte size=%d\n", err, x1 - x0, size);
     if (size > 0x2000 || size < 0) {
-        OSReport(lit_1080, size, size);
+        OSReport(lit_1108, size, size);
         size = 0x2000;
     }
     MemCpy(MemCardAdr, dst, size);
@@ -1572,16 +1631,16 @@ s32 TEA_mcFileReadGather(s32 slot, s32 cnt, void *dst)
     (void)x0;
     return 1;
 }
-#undef lit_1397
-#define lit_1397 "\t\x83\x81\x83\x82\x83\x8a\x81[\x83t\x83@\x83" "C\x83\x8b\x83\x8a\x81[\x83h\x83M\x83\x83\x83U\x8aJ\x8en \n"
-#undef lit_1398
-#define lit_1398 "\t\x83\x81\x83\x82\x83\x8a\x81[\x83t\x83@\x83" "C\x83\x8b\x83\x8a\x81[\x83h\x83M\x83\x83\x83U\x8e\xb8\x94s"
-#undef lit_1399
-#define lit_1399 "\t\x83\x81\x83\x82\x83\x8a\x81[\x8am\x95\xdbRG:%d %x no=%d \n"
-#undef lit_1400
-#define lit_1400 "\tReadByteRG(%d)\n"
-#undef lit_1401
-#define lit_1401 "done.RG (%d) %d Byte size=%d\n"
+#undef lit_1425
+#define lit_1425 "\t\x83\x81\x83\x82\x83\x8a\x81[\x83t\x83@\x83" "C\x83\x8b\x83\x8a\x81[\x83h\x83M\x83\x83\x83U\x8aJ\x8en \n"
+#undef lit_1426
+#define lit_1426 "\t\x83\x81\x83\x82\x83\x8a\x81[\x83t\x83@\x83" "C\x83\x8b\x83\x8a\x81[\x83h\x83M\x83\x83\x83U\x8e\xb8\x94s"
+#undef lit_1427
+#define lit_1427 "\t\x83\x81\x83\x82\x83\x8a\x81[\x8am\x95\xdbRG:%d %x no=%d \n"
+#undef lit_1428
+#define lit_1428 "\tReadByteRG(%d)\n"
+#undef lit_1429
+#define lit_1429 "done.RG (%d) %d Byte size=%d\n"
 s32 TEA_mcSaveFile0(s32 slot, s32 fno, s32 idx)
 {
     u8 bufB[0x1a90];
@@ -1672,24 +1731,24 @@ s32 TEA_mcSaveFile0(s32 slot, s32 fno, s32 idx)
         return 0;
     }
 }
-#undef lit_1149
-#define lit_1149 "Tears"
-#undef lit_1434
-#define lit_1434 "\x83\x81\x83\x82\x83J\x8d\xec\x90\xac \x83Z\x83N\x83^ERR"
-#undef lit_1435
-#define lit_1435 "\n\n\nLoad\x8b\x8c:Start Stage=%d Mapno=%d Single=%d NowZoid=%d NowCust=%d\n \x90l\x95\xa8=%d \x8b\xe0=%d partsnum=%d posh=%d %s \x95\xaa\x8a\x84%d SaveSize=%d\n"
-#undef lit_1436
-#define lit_1436 "MemSaveFile0\x90\xac\x8c\xf7" "A EndSUM:%d %s \x83T\x83" "C\x83Y=%d\n"
-#undef lit_1437
-#define lit_1437 "\x83\x81\x83\x82\x83J\x83\x81\x83" "C\x83N\x8e\xb8\x94sB"
-#undef lit_1438
-#define lit_1438 "MemSaveFile0\x90\xac\x8c\xf7" "B EndSUM:%d %s \x83T\x83" "C\x83Y=%d\n"
-#undef lit_1439
-#define lit_1439 "\x83\x81\x83\x82\x83J\x83\x81\x83" "C\x83N\x8e\xb8\x94sC"
-#undef lit_1440
-#define lit_1440 "\x83\x81\x83\x82\x83J\x83\x81\x83" "C\x83N\x8e\xb8\x94sD"
-#undef lit_1441
-#define lit_1441 "\x83\x81\x83\x82\x83J\x83\x81\x83" "C\x83N SLOT NON"
+#undef lit_1177
+#define lit_1177 "Tears"
+#undef lit_1462
+#define lit_1462 "\x83\x81\x83\x82\x83J\x8d\xec\x90\xac \x83Z\x83N\x83^ERR"
+#undef lit_1463
+#define lit_1463 "\n\n\nLoad\x8b\x8c:Start Stage=%d Mapno=%d Single=%d NowZoid=%d NowCust=%d\n \x90l\x95\xa8=%d \x8b\xe0=%d partsnum=%d posh=%d %s \x95\xaa\x8a\x84%d SaveSize=%d\n"
+#undef lit_1464
+#define lit_1464 "MemSaveFile0\x90\xac\x8c\xf7" "A EndSUM:%d %s \x83T\x83" "C\x83Y=%d\n"
+#undef lit_1465
+#define lit_1465 "\x83\x81\x83\x82\x83J\x83\x81\x83" "C\x83N\x8e\xb8\x94sB"
+#undef lit_1466
+#define lit_1466 "MemSaveFile0\x90\xac\x8c\xf7" "B EndSUM:%d %s \x83T\x83" "C\x83Y=%d\n"
+#undef lit_1467
+#define lit_1467 "\x83\x81\x83\x82\x83J\x83\x81\x83" "C\x83N\x8e\xb8\x94sC"
+#undef lit_1468
+#define lit_1468 "\x83\x81\x83\x82\x83J\x83\x81\x83" "C\x83N\x8e\xb8\x94sD"
+#undef lit_1469
+#define lit_1469 "\x83\x81\x83\x82\x83J\x83\x81\x83" "C\x83N SLOT NON"
 s32 TEA_mcLoadFile0(s32 slot, s32 sector, s32 record)
 {
     u8 copy[0x1a90];
@@ -1751,7 +1810,7 @@ s32 TEA_mcLoadFile0(s32 slot, s32 sector, s32 record)
     TEA_mcUnMount(slot);
     if (record != -1 && data.has_data == 0)
         ok = 0;
-    memcpy(copy, lit_1149, 5);
+    memcpy(copy, lit_1177, 5);
     for (i = 0; i < 5; i++) {
         if (data.sig[i] != copy[i]) {
             OSReport("Zoid\x82\xcc\x83" "f\x81[\x83^\x82\xc5\x82\xc8\x82\xa2" "A\n");
@@ -1786,24 +1845,24 @@ s32 TEA_mcLoadFile0(s32 slot, s32 sector, s32 record)
         memcpy(IveSaveFlag, &data, 0x1a90);
     return 1;
 }
-#undef lit_1489
-#define lit_1489 "\x83\x81\x83\x82\x83JRead0 \x83Z\x83N\x83^ERR"
-#undef lit_1490
-#define lit_1490 "\n\nLoadGather:End1 Stage=%d Mapno=%d Single=%d NowZoid=%d NowCust=%d\n \x90l\x95\xa8=%d \x8b\xe0=%d partsnum=%d posh=%d %s \x95\xaa\x8a\x84%d\n"
-#undef lit_1491
-#define lit_1491 "\n\nLoadGather:End2 \x83o\x83g\x83N\x83\x8a\x83" "A=%d Stage=%d Mapno=%d Single=%d NowZoid=%d NowCust=%d\n \x90l\x95\xa8=%d \x8b\xe0=%d partsnum=%d posh=%d %s \x95\xaa\x8a\x84%d\n"
-#undef lit_1492
-#define lit_1492 "\x83\x81\x83\x82\x83J\x83t\x83@\x83" "C\x83\x8b\x96\xb3\x82\xb5:%d[%s] no=%d \n"
-#undef lit_1493
-#define lit_1493 "Zoid\x82\xcc\x83" "f\x81[\x83^\x82\xc5\x82\xc8\x82\xa2" "A\n"
-#undef lit_1494
-#define lit_1494 "Tears["
-#undef lit_1495
-#define lit_1495 "]\n"
-#undef lit_1496
-#define lit_1496 "Zoid\x82\xcc\x83" "f\x81[\x83^\x81" "F\x83`\x83" "F\x83" "b\x83N\x83T\x83\x80\x83G\x83\x89\x81[ SUM=%d \n"
-#undef lit_1497
-#define lit_1497 "Zoid\x82\xcc\x83" "f\x81[\x83^\x81" "F\x83`\x83" "F\x83" "b\x83N\x83T\x83\x80OK SUM=%d \n"
+#undef lit_1517
+#define lit_1517 "\x83\x81\x83\x82\x83JRead0 \x83Z\x83N\x83^ERR"
+#undef lit_1518
+#define lit_1518 "\n\nLoadGather:End1 Stage=%d Mapno=%d Single=%d NowZoid=%d NowCust=%d\n \x90l\x95\xa8=%d \x8b\xe0=%d partsnum=%d posh=%d %s \x95\xaa\x8a\x84%d\n"
+#undef lit_1519
+#define lit_1519 "\n\nLoadGather:End2 \x83o\x83g\x83N\x83\x8a\x83" "A=%d Stage=%d Mapno=%d Single=%d NowZoid=%d NowCust=%d\n \x90l\x95\xa8=%d \x8b\xe0=%d partsnum=%d posh=%d %s \x95\xaa\x8a\x84%d\n"
+#undef lit_1520
+#define lit_1520 "\x83\x81\x83\x82\x83J\x83t\x83@\x83" "C\x83\x8b\x96\xb3\x82\xb5:%d[%s] no=%d \n"
+#undef lit_1521
+#define lit_1521 "Zoid\x82\xcc\x83" "f\x81[\x83^\x82\xc5\x82\xc8\x82\xa2" "A\n"
+#undef lit_1522
+#define lit_1522 "Tears["
+#undef lit_1523
+#define lit_1523 "]\n"
+#undef lit_1524
+#define lit_1524 "Zoid\x82\xcc\x83" "f\x81[\x83^\x81" "F\x83`\x83" "F\x83" "b\x83N\x83T\x83\x80\x83G\x83\x89\x81[ SUM=%d \n"
+#undef lit_1525
+#define lit_1525 "Zoid\x82\xcc\x83" "f\x81[\x83^\x81" "F\x83`\x83" "F\x83" "b\x83N\x83T\x83\x80OK SUM=%d \n"
 s32 TEA_mcFileCreat0(s32 slot, char *name, s32 size)
 {
     s32 s0 = 0;
@@ -1817,7 +1876,7 @@ s32 TEA_mcFileCreat0(s32 slot, char *name, s32 size)
     MemcardNowSlot = slot;
     err = CARDGetSectorSize(slot, &MemCardSectorSize);
     if (err < -1) {
-        OSReport(lit_959, err);
+        OSReport(lit_972, err);
         return 0;
     }
     MemCardLength = (size + 0x643 + MemCardSectorSize) & ~(MemCardSectorSize - 1);
@@ -1860,21 +1919,21 @@ s32 TEA_mcFileCreat0(s32 slot, char *name, s32 size)
         return 0;
     }
     CARDClose(&MemCardFileInfo);
-    OSReport(lit_966);
+    OSReport(lit_979);
     return 1;
 }
-#undef lit_1521
-#define lit_1521 "FileCreat0 File1:%s Delete \n"
-#undef lit_1522
-#define lit_1522 "FileCreat0 failed. (%d)\n"
-#undef lit_1523
-#define lit_1523 "\x83t\x83@\x83" "C\x83\x8b\x8d\xec\x90\xac" "0\x8e\xb8\x94s TimeOver\n"
-#undef lit_1524
-#define lit_1524 "\x83t\x83@\x83" "C\x83\x8b\x8d\xec\x90\xac" "0\x8e\xb8\x94sIOERR\n"
-#undef lit_1525
-#define lit_1525 "FileCreat0 done. (%d:%d:%d)\n"
-#undef lit_1526
-#define lit_1526 "FileCreat0 writeErr"
+#undef lit_1549
+#define lit_1549 "FileCreat0 File1:%s Delete \n"
+#undef lit_1550
+#define lit_1550 "FileCreat0 failed. (%d)\n"
+#undef lit_1551
+#define lit_1551 "\x83t\x83@\x83" "C\x83\x8b\x8d\xec\x90\xac" "0\x8e\xb8\x94s TimeOver\n"
+#undef lit_1552
+#define lit_1552 "\x83t\x83@\x83" "C\x83\x8b\x8d\xec\x90\xac" "0\x8e\xb8\x94sIOERR\n"
+#undef lit_1553
+#define lit_1553 "FileCreat0 done. (%d:%d:%d)\n"
+#undef lit_1554
+#define lit_1554 "FileCreat0 writeErr"
 s32 TEA_mcFileOldFileChk(s32 slot, s32 fileNo)
 {
     char *game = "GZOJ";
@@ -1924,35 +1983,35 @@ s32 TEA_mcFileOldFileChk(s32 slot, s32 fileNo)
     }
     return ok;
 }
-#undef lit_1561
-#define lit_1561 "GZOJ"
-#undef lit_1562
-#define lit_1562 "DA"
-#undef lit_1563
-#define lit_1563 "ZOIDSVS.TEA"
-#undef lit_1564
-#define lit_1564 "\x8b\x8c\x83t\x83@\x83" "C\x83\x8b\x8am\x94" "F-GameName:%.4s company:%.2s Fno:%d\n"
-#undef lit_1565
-#define lit_1565 "\x8b\x8c\x83t\x83@\x83" "C\x83\x8b\x8am\x94" "F-fileName[%.32s] MSG[ADR=%d] \n"
-#undef lit_1566
-#define lit_1566 "\x8b\x8c\x83t\x83@\x83" "C\x83\x8b OK SaveSize:%d Time:%d \n"
+#undef lit_1589
+#define lit_1589 "GZOJ"
+#undef lit_1590
+#define lit_1590 "DA"
+#undef lit_1591
+#define lit_1591 "ZOIDSVS.TEA"
+#undef lit_1592
+#define lit_1592 "\x8b\x8c\x83t\x83@\x83" "C\x83\x8b\x8am\x94" "F-GameName:%.4s company:%.2s Fno:%d\n"
+#undef lit_1593
+#define lit_1593 "\x8b\x8c\x83t\x83@\x83" "C\x83\x8b\x8am\x94" "F-fileName[%.32s] MSG[ADR=%d] \n"
+#undef lit_1594
+#define lit_1594 "\x8b\x8c\x83t\x83@\x83" "C\x83\x8b OK SaveSize:%d Time:%d \n"
 #pragma force_active on
-static const char lit_1575[26] = "\x8b\x8c\x83]\x83" "C\x83h\x83t\x83@\x83" "C\x83\x8b\x91\xb6\x8d\xdd\x82\xb9\x82\xb8\n";
-static const char lit_1616[13] = "MCC Enum ...";
-static const char lit_1618[35] = "MCCEnumDevices() error\nTerminated\n";
-static const char lit_1619[12] = "MCCEnum %d\n";
-static const char lit_1620[34] = "\tMCC.NG\tUSB Server\x82\xc6\x82\xcc\x92\xca\x90M\x82\xc9\x8e\xb8\x94s\n";
-static const char lit_1621[10] = "\tMCC.OK\t\n";
-static const char lit_1622[12] = "MccOpen Ok\n";
-static const char lit_1623[13] = "MccOpen Err\n";
-static const char lit_1624[10] = "MCC Fail\n";
-static const char lit_1625[11] = "TTY Init .";
-static const char lit_1635[11] = "FIO Init .";
-static const char lit_1637[15] = " Host\x92\xe2\x8e~\x92\x86!\t\n";
-static const char lit_1638[10] = " Active\t\n";
-static const char lit_1658[20] = "\tUSBAdapter EXI=%d\t";
-static const char lit_1669[16] = "MCC PING Recv \n";
-static const char lit_1670[18] = "MCC RePING Recv \n";
+static const char lit_1603[26] = "\x8b\x8c\x83]\x83" "C\x83h\x83t\x83@\x83" "C\x83\x8b\x91\xb6\x8d\xdd\x82\xb9\x82\xb8\n";
+static const char lit_1644[13] = "MCC Enum ...";
+static const char lit_1646[35] = "MCCEnumDevices() error\nTerminated\n";
+static const char lit_1647[12] = "MCCEnum %d\n";
+static const char lit_1648[34] = "\tMCC.NG\tUSB Server\x82\xc6\x82\xcc\x92\xca\x90M\x82\xc9\x8e\xb8\x94s\n";
+static const char lit_1649[10] = "\tMCC.OK\t\n";
+static const char lit_1650[12] = "MccOpen Ok\n";
+static const char lit_1651[13] = "MccOpen Err\n";
+static const char lit_1652[10] = "MCC Fail\n";
+static const char lit_1653[11] = "TTY Init .";
+static const char lit_1663[11] = "FIO Init .";
+static const char lit_1665[15] = " Host\x92\xe2\x8e~\x92\x86!\t\n";
+static const char lit_1666[10] = " Active\t\n";
+static const char lit_1686[20] = "\tUSBAdapter EXI=%d\t";
+static const char lit_1697[16] = "MCC PING Recv \n";
+static const char lit_1698[18] = "MCC RePING Recv \n";
 #pragma force_active off
 static void mccUserCallBack(s32 channel, u32 event, u32 value)
 {
@@ -2027,10 +2086,10 @@ static void mccUserCallBack(s32 channel, u32 event, u32 value)
         }
     }
 }
-#undef lit_1702
-#define lit_1702 "mcc\x83" "f\x81[\x83^\x8e\xf3\x90M\x8fI\x97\xb9\n"
-#undef lit_1703
-#define lit_1703 "XFB BMP\x91\x97\x90M\x97v\x8b\x81\x93\xc1\x8c\xa0\x96\xbd\x97\xdf\x8e\xf3\x90M ADR=%08X\n"
+#undef lit_1730
+#define lit_1730 "mcc\x83" "f\x81[\x83^\x8e\xf3\x90M\x8fI\x97\xb9\n"
+#undef lit_1731
+#define lit_1731 "XFB BMP\x91\x97\x90M\x97v\x8b\x81\x93\xc1\x8c\xa0\x96\xbd\x97\xdf\x8e\xf3\x90M ADR=%08X\n"
 #pragma force_active on
 u8 ZoidSe[25482] = {
     0xFF, 0xFF, 0, 0x93, 0, 0x94, 0, 0x95, 
@@ -5325,30 +5384,30 @@ void TEA_usbmccControlChk(u8 code)
     }
     code = 0;
 }
-#undef lit_1711
-#define lit_1711 "mcc\x83R\x83\x93\x83g\x83\x8d\x81[\x83\x8b\x83R\x81[\x83h\x8e\xf3\x90M\n"
-#undef lit_1712
-#define lit_1712 "Recive 1stProc\x8fI\x97\xb9\n"
-#undef lit_1713
-#define lit_1713 " ApiCodex=%04X SubCode=%04X Size=%8X \n"
-#undef lit_1714
-#define lit_1714 " ApiCoded=%04d SubCode=%04d Size=%8d \n"
-#undef lit_1715
-#define lit_1715 "\x8fI\x97\xb9\x83R\x81[\x83h\x8am\x94" "F\n"
+#undef lit_1739
+#define lit_1739 "mcc\x83R\x83\x93\x83g\x83\x8d\x81[\x83\x8b\x83R\x81[\x83h\x8e\xf3\x90M\n"
+#undef lit_1740
+#define lit_1740 "Recive 1stProc\x8fI\x97\xb9\n"
+#undef lit_1741
+#define lit_1741 " ApiCodex=%04X SubCode=%04X Size=%8X \n"
+#undef lit_1742
+#define lit_1742 " ApiCoded=%04d SubCode=%04d Size=%8d \n"
+#undef lit_1743
+#define lit_1743 "\x8fI\x97\xb9\x83R\x81[\x83h\x8am\x94" "F\n"
 #pragma force_active on
-static const char lit_1736[29] = "usbSendBuf:\x83X\x83\x8c\x83" "b\x83h\x8d\xec\x90\xac\x95s\x89\xc2\n";
-static const char lit_1751[32] = "usbSendBufApi:\x83X\x83\x8c\x83" "b\x83h\x8d\xec\x90\xac\x95s\x89\xc2\n";
-static const char lit_1752[37] = "usbSendBufApiLeave:\x83X\x83\x8c\x83" "b\x83h\x8d\xec\x90\xac\x95s\x89\xc2\n";
-static const char lit_1809[30] = "XFB BMP\x91\x97\x90M\x97v\x8b\x81\x8e\xf3\x90M ADR=%08X\n";
-static const char lit_1811[34] = "NowTime %d/%d/%d %02d:%02d:%02d \n";
-static const char lit_1813[16] = "\x8am\x94" "F\x83R\x81[\x83h\x91\x97\x90M\n";
-static const char lit_1832[49] = "mccwrite st1 size=%8d \x97]\x82\xe8=%04d adiv=%d rest=%d\n";
-static const char lit_1833[23] = "mccwrite err count=%d\n";
-static const char lit_1834[13] = "mccwrite ok\n";
-static const char lit_1836[14] = "mccwrite End\n";
-static const char lit_1839[20] = "mcchiowritemailbox\n";
-static const char lit_1859[12] = "audio/se/se";
-static const char lit_1872[18] = "SE Restore %d=%s\n";
+static const char lit_1764[29] = "usbSendBuf:\x83X\x83\x8c\x83" "b\x83h\x8d\xec\x90\xac\x95s\x89\xc2\n";
+static const char lit_1779[32] = "usbSendBufApi:\x83X\x83\x8c\x83" "b\x83h\x8d\xec\x90\xac\x95s\x89\xc2\n";
+static const char lit_1780[37] = "usbSendBufApiLeave:\x83X\x83\x8c\x83" "b\x83h\x8d\xec\x90\xac\x95s\x89\xc2\n";
+static const char lit_1837[30] = "XFB BMP\x91\x97\x90M\x97v\x8b\x81\x8e\xf3\x90M ADR=%08X\n";
+static const char lit_1839[34] = "NowTime %d/%d/%d %02d:%02d:%02d \n";
+static const char lit_1841[16] = "\x8am\x94" "F\x83R\x81[\x83h\x91\x97\x90M\n";
+static const char lit_1860[49] = "mccwrite st1 size=%8d \x97]\x82\xe8=%04d adiv=%d rest=%d\n";
+static const char lit_1861[23] = "mccwrite err count=%d\n";
+static const char lit_1862[13] = "mccwrite ok\n";
+static const char lit_1864[14] = "mccwrite End\n";
+static const char lit_1867[20] = "mcchiowritemailbox\n";
+static const char lit_1887[12] = "audio/se/se";
+static const char lit_1900[18] = "SE Restore %d=%s\n";
 #pragma force_active off
 s32 TEA_BgmSfxLoad(char *name, u16 id)
 {
@@ -5363,7 +5422,7 @@ s32 TEA_BgmSfxLoad(char *name, u16 id)
     }
     if (loaded == 0) {
         sReadPre();
-        TEA_SoundSfxLoad(lit_1859, 8);
+        TEA_SoundSfxLoad(lit_1887, 8);
         loaded++;
     }
     if (loaded == 1) {
@@ -5405,17 +5464,17 @@ s32 TEA_SoundSfxLoad(char *name, s16 id)
     }
     return 1;
 }
-#undef lit_1889
-#define lit_1889 "%s.sam"
-#undef lit_1890
-#define lit_1890 "sound SFX load [%s] \n"
-#undef lit_1891
-#define lit_1891 "sam  out of memory %s\n"
-#undef lit_1892
-#define lit_1892 "SE Load Num=%d fn=%s\n"
+#undef lit_1917
+#define lit_1917 "%s.sam"
+#undef lit_1918
+#define lit_1918 "sound SFX load [%s] \n"
+#undef lit_1919
+#define lit_1919 "sam  out of memory %s\n"
+#undef lit_1920
+#define lit_1920 "SE Load Num=%d fn=%s\n"
 #pragma force_active on
-static const char lit_1896[32] = "SE UnLoaded POP POP POP now=%d ";
-static const char lit_1897[10] = " pop OFF\n";
+static const char lit_1924[32] = "SE UnLoaded POP POP POP now=%d ";
+static const char lit_1925[10] = " pop OFF\n";
 #pragma force_active off
 s32 TEA_SeOnF(u16 id, f32 vol_in, f32 pan_in)
 {
@@ -5475,10 +5534,10 @@ void TEA_VoiceOn(u8 character, s16 voice)
         TEA_VoiceFilePlay(path, TEA_VOICEVOL, 0);
     OSReport("voice [%s] start \n", path);
 }
-#undef lit_2132
-#define lit_2132 "voice/%02d/V%02d_%02d.adp"
-#undef lit_2133
-#define lit_2133 "voice [%s] start \n"
+#undef lit_2160
+#define lit_2160 "voice/%02d/V%02d_%02d.adp"
+#undef lit_2161
+#define lit_2161 "voice [%s] start \n"
 void TeaBgm(s16 no)
 {
     char path[80];
@@ -5526,22 +5585,22 @@ void TeaBgm(s16 no)
     no = no;
     flag = 0;
 }
-#undef lit_2153
-#define lit_2153 "SEQ StopSeq \n"
-#undef lit_2154
-#define lit_2154 "SEQ Free \n"
-#undef lit_2155
-#define lit_2155 "audio/bgm/%s.son"
-#undef lit_2156
-#define lit_2156 "SEQ Play FileChk %s \n"
-#undef lit_2157
-#define lit_2157 "audio/bgm/%s"
-#undef lit_2158
-#define lit_2158 "%s error \n"
-#undef lit_2159
-#define lit_2159 "SEQ LoadSfxOk \n"
-#undef lit_2160
-#define lit_2160 "SEQ PlayOk %s \n"
+#undef lit_2181
+#define lit_2181 "SEQ StopSeq \n"
+#undef lit_2182
+#define lit_2182 "SEQ Free \n"
+#undef lit_2183
+#define lit_2183 "audio/bgm/%s.son"
+#undef lit_2184
+#define lit_2184 "SEQ Play FileChk %s \n"
+#undef lit_2185
+#define lit_2185 "audio/bgm/%s"
+#undef lit_2186
+#define lit_2186 "%s error \n"
+#undef lit_2187
+#define lit_2187 "SEQ LoadSfxOk \n"
+#undef lit_2188
+#define lit_2188 "SEQ PlayOk %s \n"
 void TEA_SeqPlay(u16 a, u16 b, char *name)
 {
     u16 c = 300;
@@ -5579,30 +5638,30 @@ void TEA_SeqPlay(u16 a, u16 b, char *name)
     TEA_AudioSeqVolume(TEA_BGMVOL, 0, 0);
     OSReport("SEQ PLAY %s\n", name);
 }
-#undef lit_2174
-#define lit_2174 "SEQ STOP %s\n"
-#undef lit_2175
-#define lit_2175 "SEQ PLAY OK VOLSET(%d)  %d\n"
-#undef lit_2176
-#define lit_2176 "AUDIO -----%d \n"
-#undef lit_2177
-#define lit_2177 "SEQ PLAY %s\n"
+#undef lit_2202
+#define lit_2202 "SEQ STOP %s\n"
+#undef lit_2203
+#define lit_2203 "SEQ PLAY OK VOLSET(%d)  %d\n"
+#undef lit_2204
+#define lit_2204 "AUDIO -----%d \n"
+#undef lit_2205
+#define lit_2205 "SEQ PLAY %s\n"
 #pragma force_active on
-static const char lit_2194[33] = " DVD NoSeek Start %s=%d len=%d \n";
-static const char lit_2206[14] = " DVD NOW =%d\n";
-static const char lit_2207[14] = " DVD END =%d\n";
-static const char lit_2211[22] = "ADP:\x83X\x83\x8c\x83" "b\x83h\x8d\xec\x90\xac\x95s\x89\xc2\n";
-static const char lit_2236[16] = " DVD CANCEL %d\n";
-static const char lit_2237[10] = "voice %d ";
-static const f64 lit_1991[1] = { 4503601774854144.0 };
-static const f32 lit_2014[1] = { 0.0f };
-static const f64 lit_2015[1] = { 0.5 };
-static const f64 lit_2016[1] = { 3.0 };
-static const f32 lit_2017[1] = { 500.0f };
-static const f32 lit_2018[1] = { 1.0f };
-static const f32 lit_2019[1] = { 64.0f };
-static const f32 lit_2020[1] = { 5.0f };
-static const char lit_2021[4] = "C\xf7\x80";
-static const f32 lit_2022[1] = { 127.0f };
+static const char lit_2222[33] = " DVD NoSeek Start %s=%d len=%d \n";
+static const char lit_2234[14] = " DVD NOW =%d\n";
+static const char lit_2235[14] = " DVD END =%d\n";
+static const char lit_2239[22] = "ADP:\x83X\x83\x8c\x83" "b\x83h\x8d\xec\x90\xac\x95s\x89\xc2\n";
+static const char lit_2264[16] = " DVD CANCEL %d\n";
+static const char lit_2265[10] = "voice %d ";
+static const f64 lit_2019[1] = { 4503601774854144.0 };
+static const f32 lit_2042[1] = { 0.0f };
+static const f64 lit_2043[1] = { 0.5 };
+static const f64 lit_2044[1] = { 3.0 };
+static const f32 lit_2045[1] = { 500.0f };
+static const f32 lit_2046[1] = { 1.0f };
+static const f32 lit_2047[1] = { 64.0f };
+static const f32 lit_2048[1] = { 5.0f };
+static const char lit_2049[4] = "C\xf7\x80";
+static const f32 lit_2050[1] = { 127.0f };
 #pragma force_active off
 }
