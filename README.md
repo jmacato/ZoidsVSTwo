@@ -2,6 +2,8 @@
 
 A matching decompilation of Zoids VS. II for the GameCube (Japan, game ID `GZSJDA`). All 3,233 functions of the game (1,121,480 bytes) compile from the C and C++ sources in this repository to the same bytes as the original executable, and the rebuilt `main.dol` is identical to the original.
 
+Battle Legends is in https://github.com/jmacato/ZoidsVSTwo/tree/battle-legends 
+
 This repository contains no game data and no compilers.
 
 ## Requirements
