@@ -4,7 +4,7 @@ extern THPPlayer ActivePlayer;
 extern void *PopFreeAudioBuffer();
 extern void PushDecodedAudioBuffer(void *buf);
 
-static void AudioDecode(THPReadBuffer *readBuffer)
+void AudioDecode(THPReadBuffer *readBuffer)
 {
     THPAudioBuffer *audioBuf;
     s32 i;

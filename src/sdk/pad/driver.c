@@ -18,7 +18,8 @@ extern void SISetCommand(s32, u32);
      PAD_TRIGGER_Z | PAD_TRIGGER_R | PAD_TRIGGER_L | PAD_BUTTON_A | PAD_BUTTON_B |     \
      PAD_BUTTON_X | PAD_BUTTON_Y | PAD_BUTTON_MENU | 0x2000 | 0x0080)
 
-u16 __OSWirelessPadFixMode : 0x800030E0;
+extern u16 __OSWirelessPadFixMode;
+__asm__(".set __OSWirelessPadFixMode, 0x800030E0");
 
 static void SPEC2_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 
@@ -312,7 +313,8 @@ s32 PADReset(u32 mask)
     return TRUE;
 }
 
-u8 GameChoice : 0x800030E3;
+extern u8 GameChoice;
+__asm__(".set GameChoice, 0x800030E3");
 
 static inline s32 PADRecalibrate(u32 mask)
 {

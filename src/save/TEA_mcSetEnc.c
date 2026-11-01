@@ -22,7 +22,8 @@ extern void sPadAll(void);
 extern void SeRet(void);
 extern s32 TEA_mcChkSlot(s32 channel);
 extern s32 TEA_mcFormat(s32 channel);
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 
 s32 TEA_mcSetEnc(s32 slot)
 {

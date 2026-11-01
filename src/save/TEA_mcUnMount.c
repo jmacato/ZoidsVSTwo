@@ -2,7 +2,8 @@
 #include "card.h"
 #include "os_time.h"
 
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 extern s32 MemcardNowSlot;
 
 s32 TEA_mcUnMount(s32 slot)

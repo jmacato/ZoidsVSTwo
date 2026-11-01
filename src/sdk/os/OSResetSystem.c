@@ -21,10 +21,14 @@ struct OSResetFunctionQueue {
 
 static struct OSResetFunctionQueue ResetFunctionQueue;
 
-extern OSThreadQueue __OSActiveThreadQueue : 0x800000DC;
-extern volatile u16 __VIRegs[32] : 0xCC002000;
-extern volatile u32 __PIRegs[16] : 0xCC003000;
-extern u8 OS_REBOOT_BOOL : 0x800030E2;
+extern OSThreadQueue __OSActiveThreadQueue;
+__asm__(".set __OSActiveThreadQueue, 0x800000DC");
+extern volatile u16 __VIRegs[32];
+__asm__(".set __VIRegs, 0xCC002000");
+extern volatile u32 __PIRegs[16];
+__asm__(".set __PIRegs, 0xCC003000");
+extern u8 OS_REBOOT_BOOL;
+__asm__(".set OS_REBOOT_BOOL, 0x800030E2");
 extern void __OSStopAudioSystem(void);
 extern s32 __PADDisableRecalibration(s32);
 extern OSSram *__OSLockSram(void);

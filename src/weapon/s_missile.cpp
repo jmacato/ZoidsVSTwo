@@ -278,7 +278,7 @@ extern void misProc02(Missile3 *missile, Vec3 *target);
 extern void misProcAT20(Missile3 *missile, Vec3 *target);
 extern void misProcAT50(Missile3 *missile, Vec3 *target);
 #pragma force_active on
-static ModelArchive *missileFile[130];
+ModelArchive *missileFile[130];
 Missile3 missileStart[200];
 #pragma force_active off
 ModelArchive *sMissileLoad(s32 index, BulletDat *name)

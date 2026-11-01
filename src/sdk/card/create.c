@@ -12,7 +12,8 @@ extern char *strncpy(char *, const char *, unsigned int);
 #include "card_internal.h"
 #include "os_time.h"
 #define NULL 0
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 extern void *memset(void *, int, u32);
 extern void *memcpy(void *, const void *, u32);
 extern u32 strlen(const char *);

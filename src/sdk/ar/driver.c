@@ -4,7 +4,8 @@
 #include "os_context.h"
 #include "os_interrupt.h"
 #define OSPhysicalToUncached(address) ((void *)((u32)(address) + 0xC0000000))
-extern volatile u16 __DSPRegs[32] : 0xCC005000;
+extern volatile u16 __DSPRegs[32];
+__asm__(".set __DSPRegs, 0xCC005000");
 extern void DCFlushRange(void *, u32);
 extern void DCInvalidateRange(void *, u32);
 extern void PPCSync(void);

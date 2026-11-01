@@ -1,7 +1,8 @@
 #include "types.h"
 
 extern u32 OSGetTick(void);
-extern volatile u16 __DSPRegs[] : 0xCC005000;
+extern volatile u16 __DSPRegs[];
+__asm__(".set __DSPRegs, 0xCC005000");
 extern void *OSGetArenaHi(void);
 extern void *memcpy(void *dst, const void *src, u32 n);
 extern void DCFlushRange(void *addr, u32 n);

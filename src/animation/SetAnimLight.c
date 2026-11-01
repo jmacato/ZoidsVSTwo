@@ -2,7 +2,7 @@
 #include "lobj.h"
 
 #pragma dont_inline on
-static void SetAnimLight(ModelLightAnimation *model, HSD_LObj *light, s32 selected)
+void SetAnimLight(ModelLightAnimation *model, HSD_LObj *light, s32 selected)
 {
     s32 i;
     if (model != 0) {

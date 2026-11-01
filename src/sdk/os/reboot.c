@@ -8,8 +8,10 @@
 #define TRUE 1
 #define FALSE 0
 #define OSRoundUp32B(value) (((u32)(value) + 31) & ~31)
-extern void *BOOT_REGION_START : 0x812FDFF0;
-extern void *BOOT_REGION_END : 0x812FDFEC;
+extern void *BOOT_REGION_START;
+__asm__(".set BOOT_REGION_START, 0x812FDFF0");
+extern void *BOOT_REGION_END;
+__asm__(".set BOOT_REGION_END, 0x812FDFEC");
 extern void __DVDPrepareResetAsync(DVDCBCallback);
 extern void ICInvalidateRange(void *, u32);
 extern void Run(void (*)(void));
@@ -17,9 +19,12 @@ static void *SaveStart = NULL;
 static void *SaveEnd = NULL;
 static volatile s32 Prepared;
 
-extern u8 OS_REBOOT_BOOL : 0x800030E2;
-extern u32 UNK_817FFFF8 : 0x817FFFF8;
-extern u32 UNK_817FFFFC : 0x817FFFFC;
+extern u8 OS_REBOOT_BOOL;
+__asm__(".set OS_REBOOT_BOOL, 0x800030E2");
+extern u32 UNK_817FFFF8;
+__asm__(".set UNK_817FFFF8, 0x817FFFF8");
+extern u32 UNK_817FFFFC;
+__asm__(".set UNK_817FFFFC, 0x817FFFFC");
 
 #define OS_BOOTROM_ADDR ((void *)0x81300000)
 

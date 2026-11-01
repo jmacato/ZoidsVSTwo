@@ -1,0 +1,11 @@
+[package]
+name = "zoids-build"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+default-run = "zoids-build"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+rayon = "1"
+sha1 = "0.10"

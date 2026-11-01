@@ -15,7 +15,7 @@ static void BlockReadCallback(s32 chan, s32 result)
     if ((result >= 0)) {
         card->xferred += CARD_SEG_SIZE;
         card->addr += CARD_SEG_SIZE;
-        ((u8 *)card->buffer) += CARD_SEG_SIZE;
+        card->buffer = (u8 *)card->buffer + CARD_SEG_SIZE;
 
         if (--card->repeat > 0) {
             result = __CARDReadSegment(chan, BlockReadCallback);
@@ -57,7 +57,7 @@ static void BlockWriteCallback(s32 chan, s32 result)
     if (result >= 0) {
         card->xferred += CARD_PAGE_SIZE;
         card->addr += CARD_PAGE_SIZE;
-        ((u8 *)card->buffer) += CARD_PAGE_SIZE;
+        card->buffer = (u8 *)card->buffer + CARD_PAGE_SIZE;
 
         if (--card->repeat > 0) {
             result = __CARDWritePage(chan, BlockWriteCallback);

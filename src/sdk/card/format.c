@@ -5,7 +5,8 @@
 #include "os_time.h"
 #include "os_font.h"
 #define FALSE 0
-extern volatile u16 __VIRegs[] : 0xCC002000;
+extern volatile u16 __VIRegs[];
+__asm__(".set __VIRegs, 0xCC002000");
 extern void *memcpy(void *, const void *, u32);
 extern void *memset(void *, int, u32);
 extern void DCStoreRange(void *, u32);

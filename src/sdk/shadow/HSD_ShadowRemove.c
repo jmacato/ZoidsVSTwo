@@ -6,7 +6,7 @@ extern void HSD_Free(void *);
 static void makeMatrix(HSD_Shadow *shadow);
 static HSD_ObjAllocData shadow_alloc_data;
 
-static inline HSD_ObjAllocData *HSD_ShadowGetAllocData(void)
+__attribute__((weak)) inline HSD_ObjAllocData *HSD_ShadowGetAllocData(void)
 {
     return &shadow_alloc_data;
 }

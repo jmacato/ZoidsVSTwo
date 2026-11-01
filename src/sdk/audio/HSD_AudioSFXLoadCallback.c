@@ -34,7 +34,7 @@ static inline void *audio_allocate(u32 size)
 }
 
 #pragma force_active on
-static void HSD_AudioSFXLoadCallback(s32 result, DVDFileInfo *file)
+void HSD_AudioSFXLoadCallback(s32 result, DVDFileInfo *file)
 {
     AudioSFXStack *entry;
     s32 previous = OSEnableInterrupts();

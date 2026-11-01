@@ -11,8 +11,10 @@
 #define SI_MAX_COMCSR_INLNGTH 128
 #define OSMillisecondsToTicks(value) ((value) * (__OSBusClock / 4 / 1000))
 #define OSMicrosecondsToTicks(value) ((value) * (__OSBusClock / 4 / 125000) / 8)
-extern u32 __OSBusClock : 0x800000F8;
-extern volatile u32 __SIRegs[64] : 0xCC006400;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
+extern volatile u32 __SIRegs[64];
+__asm__(".set __SIRegs, 0xCC006400");
 extern u32 VIGetCurrentLine(void);
 extern void OSSetWirelessID(s32, u16);
 extern u16 OSGetWirelessID(s32);

@@ -256,7 +256,6 @@ extern s32 dspPartnerMsgA;
 extern s32 dspPartnerMsgB;
 extern s32 dspPartnerMsgF;
 extern void zdVoiceScG(ZoidState *zoid, s32 voice);
-extern Mtx dspMtx;
 extern s32 anmFilter[3];
 extern HSD_JObj *jobjFilter[3];
 extern ModelArchive *dspSearch;
@@ -281,7 +280,7 @@ extern s32 pBak;
 void sDispPause(PauseCamera *camera);
 #pragma force_active on
 static Mtx dspMtx;
-static s32 anmFilter[3];
+s32 anmFilter[3];
 static u32 str_1478[64];
 HSD_JObj *jobjFilter[3];
 u64 dspFileA[8];
@@ -2193,28 +2192,28 @@ void sDispFilterB(void)
         gameEndF = 7;
 }
 #pragma force_active on
-static s32 onTime;
-static ModelArchive *dspSearch;
-static ModelArchive *dspScope;
-static ModelArchive *dspOrder;
-static ModelArchive *dspMessage;
-static ModelArchive *dspWarn;
-static ModelArchive *dspBP;
-static ModelArchive *dspPause;
-static ModelArchive *dspContinue;
-static ModelArchive *dspDemoPress;
-static HSD_JObj *dspJobjEx3[2];
-static s32 dspAnmEx3[2];
-static s32 dspAnmEx3n[2];
-static ModelArchive *dspRader;
-static ModelArchive *dspPartner;
-static s32 dspPartnerMsgV;
-static s32 dspPartnerMsgM;
-static s32 dspPartnerMsgB;
-static s32 dspPartnerMsgA;
-static ModelArchive *dspPoint;
-static ModelArchive *dspPos00;
-static s32 menuRet;
+s32 onTime;
+ModelArchive *dspSearch;
+ModelArchive *dspScope;
+ModelArchive *dspOrder;
+ModelArchive *dspMessage;
+ModelArchive *dspWarn;
+ModelArchive *dspBP;
+ModelArchive *dspPause;
+ModelArchive *dspContinue;
+ModelArchive *dspDemoPress;
+HSD_JObj *dspJobjEx3[2];
+s32 dspAnmEx3[2];
+s32 dspAnmEx3n[2];
+ModelArchive *dspRader;
+ModelArchive *dspPartner;
+s32 dspPartnerMsgV;
+s32 dspPartnerMsgM;
+s32 dspPartnerMsgB;
+s32 dspPartnerMsgA;
+ModelArchive *dspPoint;
+ModelArchive *dspPos00;
+s32 menuRet;
 #pragma force_active off
 typedef struct MessageCamera {
     s32 mode;
@@ -2792,6 +2791,6 @@ s32 gameTime;
 u16 dlgzoidno;
 u16 dlgpartsno;
 u16 dlgpersonno;
-static s32 pBak = -1;
+s32 pBak = -1;
 #pragma force_active off
 }

@@ -4,7 +4,8 @@
 #include "os_time.h"
 #define OFFSET(value, alignment) ((value) & ((alignment) - 1))
 #define NULL 0
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 extern void DCStoreRange(void *, u32);
 static void WriteCallback(s32 chan, s32 result);
 static void EraseCallback(s32 chan, s32 result);

@@ -9,7 +9,7 @@ extern s32 usrHeap;
 extern s32 dbgAlloc;
 
 #pragma dont_inline on
-static void debugFileInsert(void *memory)
+void debugFileInsert(void *memory)
 {
     /* The shipped debug hook only checks its pointer and returns. */
     if (memory == 0)

@@ -64,7 +64,7 @@ void AudioCallback(void);
 #pragma force_active on
 static s16 SoundBuffer[2][480];
 static s32 SoundBufferNumber;
-s32 oldaudiocallback;
+extern s32 oldaudiocallback;
 #pragma force_active off
 void TEA_THP_PlaySkip(char *path, s32 loop, s32 skip)
 {

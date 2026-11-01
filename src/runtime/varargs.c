@@ -4,7 +4,15 @@
 #include "types.h"
 #include "runtime_stdarg.h"
 
-void *__va_arg(va_list v_list, unsigned char type)
+typedef struct {
+    char gpr;
+    char fpr;
+    char reserved[2];
+    char *input_arg_area;
+    char *reg_save_area;
+} __mwcc_va_list[1];
+
+void *__va_arg(__mwcc_va_list v_list, unsigned char type)
 {
     char *addr;
     char *reg = &(v_list->gpr);

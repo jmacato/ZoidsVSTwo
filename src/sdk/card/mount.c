@@ -21,7 +21,8 @@ static u32 LatencyTable[8] = {
 static s32 DoMount(s32 chan);
 static void DoUnmount(s32 chan, s32 result);
 
-u8 GameChoice : 0x800030E3;
+extern u8 GameChoice;
+__asm__(".set GameChoice, 0x800030E3");
 
 static s32 IsCard(u32 id)
 {

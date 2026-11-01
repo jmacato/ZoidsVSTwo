@@ -6,11 +6,16 @@
 #pragma peephole off
 #define NULL 0
 #define OSPhysicalToCached(address) ((void *)((u32)(address) + 0x80000000))
-extern volatile u16 __MEMRegs[32] : 0xCC004000;
-extern volatile u16 __DSPRegs[32] : 0xCC005000;
-extern volatile u32 __PIRegs[16] : 0xCC003000;
-extern volatile u32 __AIRegs[4] : 0xCC006C00;
-extern volatile u32 __EXIRegs[15] : 0xCC006800;
+extern volatile u16 __MEMRegs[32];
+__asm__(".set __MEMRegs, 0xCC004000");
+extern volatile u16 __DSPRegs[32];
+__asm__(".set __DSPRegs, 0xCC005000");
+extern volatile u32 __PIRegs[16];
+__asm__(".set __PIRegs, 0xCC003000");
+extern volatile u32 __AIRegs[4];
+__asm__(".set __AIRegs, 0xCC006C00");
+extern volatile u32 __EXIRegs[15];
+__asm__(".set __EXIRegs, 0xCC006800");
 extern void *memset(void *, s32, u32);
 extern void OSDisableScheduler(void);
 extern void OSEnableScheduler(void);

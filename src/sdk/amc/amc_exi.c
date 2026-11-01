@@ -9,8 +9,10 @@
 #define STATE_IMM 0x02
 #define STATE_SELECTED 0x04
 
-extern volatile u32 __PIRegs[16] : 0xCC003000;
-extern volatile u32 __EXIRegs[15] : 0xCC006800;
+extern volatile u32 __PIRegs[16];
+__asm__(".set __PIRegs, 0xCC003000");
+extern volatile u32 __EXIRegs[15];
+__asm__(".set __EXIRegs, 0xCC006800");
 extern s32 OSDisableInterrupts(void);
 extern s32 OSRestoreInterrupts(s32);
 extern void *memset(void *, int, u32);

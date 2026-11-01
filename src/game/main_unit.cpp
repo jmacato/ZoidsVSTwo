@@ -449,7 +449,7 @@ extern void putErrInt(void);
 extern void sPutFontAllN(void);
 void main(void);
 #pragma force_active on
-static s32 aram_block[16];
+s32 aram_block[16];
 GameMode3 GameMode;
 s32 bp[12];
 static u64 str_1070[32];
@@ -2353,11 +2353,11 @@ void fixSave(void)
 ModelArchive *dspLoad;
 s32 normLineDEBUG;
 s32 ctrlZoid;
-static s32 AreaIn;
-static s32 AreaIn2;
-static s32 vOn44;
-static FixData *fix;
-static s32 lastGame;
+s32 AreaIn;
+s32 AreaIn2;
+s32 vOn44;
+FixData *fix;
+s32 lastGame;
 namespace { __declspec(section ".sdata2") extern const f32 lit_1354[1] = { 0.0f }; }
 namespace { __declspec(section ".sdata2") extern const f32 lit_1453[1] = { 0.0f }; }
 #pragma force_active off

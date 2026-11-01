@@ -16,7 +16,7 @@ static BOOL First;
 
 static void *VideoDecoderForOnMemory(void *arg);
 static void *VideoDecoder(void *arg);
-static void VideoDecode(THPReadBuffer *readBuffer);
+void VideoDecode(THPReadBuffer *readBuffer);
 
 
 

@@ -14,7 +14,8 @@
 #define VI_DTV_STAT 55
 #define GX_TF_I4 0
 #define GX_TF_IA4 2
-extern volatile u16 __VIRegs[64] : 0xCC002000;
+extern volatile u16 __VIRegs[64];
+__asm__(".set __VIRegs, 0xCC002000");
 extern s32 __OSReadROM(void *, s32, s32);
 extern void DCStoreRange(void *, u32);
 static OSFontHeader *FontData = 0;

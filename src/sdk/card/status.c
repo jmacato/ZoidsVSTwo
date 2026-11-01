@@ -26,7 +26,8 @@
     ((stat)->iconSpeed =                                                               \
          (u16)(((stat)->iconSpeed & ~(CARD_STAT_SPEED_MASK << (2 * (n)))) |            \
                ((f) << (2 * (n)))))
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 #define OSTicksToSeconds(value) ((value) / (__OSBusClock / 4))
 extern void *memcpy(void *, const void *, u32);
 static void UpdateIconOffsets(CARDDir *ent, CARDStat *stat);

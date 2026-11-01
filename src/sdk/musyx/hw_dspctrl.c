@@ -147,7 +147,8 @@ u32 adsrStartRelease(ADSR_VARS *adsr, u32 rtime);
 u32 adsrHandle(ADSR_VARS *adsr, u16 *start, u16 *delta);
 #define HW_MESSAGE_VIRTUAL_SAMPLE_END 3
 #define HW_MESSAGE_SAMPLE_END 0
-extern unsigned long __OSBusClock : 0x800000f8;
+extern unsigned long __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000f8");
 extern u8 salFrame;
 extern u32 dspHRTFOn;
 extern u16 *dspCmdCurBase, *dspCmdPtr, *dspCmdMaxPtr, *dspCmdLastLoad, *dspCmdLastBase;

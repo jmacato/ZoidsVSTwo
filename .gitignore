@@ -1,3 +1,4 @@
 /*.iso
+/*.gcm
 /build/
-/tools/mwperm/target/
+/target/

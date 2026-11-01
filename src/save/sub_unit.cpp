@@ -14,7 +14,8 @@ extern void OSReport(const char *fmt, ...);
 extern void TEA_mcMsgNoChkSlot(s32 slot, s32 msg);
 #include "os_time.h"
 #define OS_BUS_CLOCK (*(u32 *)0x800000F8)
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 extern s32 CARDFormat(s32 chan);
 extern s32 TEA_mcError(s32 slot, s32 err);
 extern void TEA_SePanVol(f32 a, f32 b, u8 *pan, u8 *vol);
@@ -1014,7 +1015,7 @@ s32 TEA_mcBadEncFormatEnc(s32 slot)
     limit = OSGetTime() / (OS_BUS_CLOCK / 4) + 60;
     menudispyesnopoint = 1;
     clrYesNoMsg();
-    menuYesNoSetStr(lit_856, GetMenuMsgAdr(0x476));
+    menuYesNoSetStr((char *)lit_856, GetMenuMsgAdr(0x476));
     menudispyesnoflag = 1;
     while (1) {
         sPadAll();
@@ -1023,7 +1024,7 @@ s32 TEA_mcBadEncFormatEnc(s32 slot)
             clrYesNoMsg();
             return 0;
         }
-        menudispyesnopoint = menuYesNo(menudispyesnopoint, lit_856, GetMenuMsgAdr(0x476));
+        menudispyesnopoint = menuYesNo(menudispyesnopoint, (char *)lit_856, GetMenuMsgAdr(0x476));
         if (sPad1->pressed_a != 0) {
             break;
         }
@@ -1039,7 +1040,7 @@ s32 TEA_mcBadEncFormatEnc(s32 slot)
                 clrYesNoMsg();
                 return 0;
             }
-            menudispyesnopoint = menuYesNo(menudispyesnopoint, lit_856, GetMenuMsgAdr(0x438));
+            menudispyesnopoint = menuYesNo(menudispyesnopoint, (char *)lit_856, GetMenuMsgAdr(0x438));
             if (sPad1->pressed_a != 0) {
                 break;
             }
@@ -5422,7 +5423,7 @@ s32 TEA_BgmSfxLoad(char *name, u16 id)
     }
     if (loaded == 0) {
         sReadPre();
-        TEA_SoundSfxLoad(lit_1887, 8);
+        TEA_SoundSfxLoad((char *)lit_1887, 8);
         loaded++;
     }
     if (loaded == 1) {

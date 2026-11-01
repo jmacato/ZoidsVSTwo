@@ -15,7 +15,7 @@ static BOOL AudioDecodeThreadCreated;
 
 static void *AudioDecoderForOnMemory(void *arg);
 static void *AudioDecoder(void *arg);
-static void AudioDecode(THPReadBuffer *readBuffer);
+void AudioDecode(THPReadBuffer *readBuffer);
 
 
 

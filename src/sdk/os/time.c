@@ -2,7 +2,8 @@
 #include "os_time.h"
 #include "asm_ops.h"
 #include "os_interrupt.h"
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 #define OS_BUS_CLOCK __OSBusClock
 #define OS_TIME_SPEED (OS_BUS_CLOCK / 4)
 

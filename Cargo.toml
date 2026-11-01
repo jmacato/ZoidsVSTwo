@@ -1,0 +1,7 @@
+[workspace]
+members = ["tools/build"]
+default-members = ["tools/build"]
+resolver = "3"
+
+[profile.dev]
+opt-level = 1

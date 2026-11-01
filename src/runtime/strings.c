@@ -21,70 +21,10 @@ size_t strlen(const char *str)
 
 char *strcpy(char *dst, const char *src)
 {
-    register unsigned char *destb, *fromb;
-    register unsigned long w, t, align;
-    register unsigned int k1;
-    register unsigned int k2;
+    char *p = dst;
 
-    fromb = (unsigned char *)src;
-    destb = (unsigned char *)dst;
-
-    if ((align = ((int)fromb & 3)) != ((int)destb & 3)) {
-        goto bytecopy;
-    }
-
-    if (align) {
-        if ((*destb = *fromb) == 0) {
-            return dst;
-        }
-
-        for (align = 3 - align; align; align--) {
-            if ((*(++destb) = *(++fromb)) == 0) {
-                return dst;
-            }
-        }
-        ++destb;
-        ++fromb;
-    }
-
-    k1 = K1;
-    k2 = K2;
-
-    w = *((int *)(fromb));
-
-    t = w + k2;
-
-    t &= k1;
-    if (t) {
-        goto bytecopy;
-    }
-    --((int *)(destb));
-
-    do {
-        *(++((int *)(destb))) = w;
-        w = *(++((int *)(fromb)));
-
-        t = w + k2;
-        t &= k1;
-        if (t) {
-            goto adjust;
-        }
-    } while (1);
-
-adjust:
-    ++((int *)(destb));
-
-bytecopy:
-    if ((*destb = *fromb) == 0) {
-        return dst;
-    }
-
-    do {
-        if ((*(++destb) = *(++fromb)) == 0) {
-            return dst;
-        }
-    } while (1);
-
+    while ((*p++ = *src++) != 0)
+        ;
     return dst;
 }
 
@@ -164,8 +104,8 @@ int strcmp(const char *str1, const char *str2)
     }
 
     while (l1 == r1) {
-        l1 = *(++((int *)(left)));
-        r1 = *(++((int *)(right)));
+        l1 = *(int *)(left += 4);
+        r1 = *(int *)(right += 4);
         x = l1 + K2;
         if (x & K1) {
             goto adjust;

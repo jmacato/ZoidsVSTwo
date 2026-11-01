@@ -58,7 +58,7 @@ s32 fReadO2(DVDFileInfo *file, void *memory, s32 length, s32 offset);
 
 
 
-static s32 fReadO(DVDFileInfo *file, void *memory, s32 length)
+s32 fReadO(DVDFileInfo *file, void *memory, s32 length)
 {
     return fReadO2(file, memory, length, 0);
 }

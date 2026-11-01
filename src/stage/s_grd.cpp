@@ -239,11 +239,11 @@ static inline f32 absf(f32 value)
     return value;
 }
 #pragma force_active on
-static ArcT *GroundObj[20];
-static GObj3 obj[50];
+ArcT *GroundObj[20];
+GObj3 obj[50];
 u64 Ground[8];
 u64 sPad[153];
-static s32 clipDat[241] = {
+s32 clipDat[241] = {
     0, 1, 1, 1, 1, 1, 1, 1, 
     1, 1, 1, 1, 1, 1, 1, 1, 
     1, 1, 1, 1, 1, 1, 1, 1, 
@@ -944,15 +944,15 @@ void grdObjTest(void)
 }
 #pragma force_active on
 ArcT *Sky;
-static InfoT *MapObjDef;
-static s32 MapObjDefN;
-static s32 objNow;
-static s32 objSize;
+InfoT *MapObjDef;
+s32 MapObjDefN;
+s32 objNow;
+s32 objSize;
 u32 nowShadow;
 s32 SkyAmbient;
 FogT *fogG;
 s32 nowStage = -1;
-static s32 sDispClipOnOff = 1;
+s32 sDispClipOnOff = 1;
 u32 sPad1 = 0x80151A08;
 u32 sPad2 = 0x80151A90;
 u32 sPad3 = 0x80151B18;

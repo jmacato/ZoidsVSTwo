@@ -9,7 +9,7 @@ extern f32 atan2f(f32, f32);
 extern f64 __frsqrte(f64);
 #pragma push
 #pragma force_active on
-static void genPosUpdate(HSD_Generator *generator)
+void genPosUpdate(HSD_Generator *generator)
 {
     HSD_JObj *joint;
     if (generator == 0)
@@ -33,7 +33,7 @@ static void genPosUpdate(HSD_Generator *generator)
         generator->pos.z = generator->jobj->matrix[2][3];
     }
 }
-static void modifyDir(HSD_Particle *pp, f32 angle)
+void modifyDir(HSD_Particle *pp, f32 angle)
 {
     f32 vx = pp->vel.x;
     f32 vz = pp->vel.z;
@@ -118,7 +118,7 @@ static void modifyDir(HSD_Particle *pp, f32 angle)
         cos_e * (cos_angle * cos_a) + (sin_e * (-cos_rand * cos_a) - sin_rand * sin_a);
 }
 
-static s32 applyForceJObj(HSD_Particle *particle, HSD_JObj *joint, f32 force, f32 range)
+s32 applyForceJObj(HSD_Particle *particle, HSD_JObj *joint, f32 force, f32 range)
 {
     f32 dx, dy, dz, distance_squared, scale;
     if (joint == 0 || range < 0.0F)

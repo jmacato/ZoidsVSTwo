@@ -8,8 +8,10 @@ typedef struct OSModuleQueue {
     OSModuleInfo *tail;
 } OSModuleQueue;
 
-OSModuleQueue __OSModuleInfoList : 0x800030C8;
-void *__OSStringTable : 0x800030D0;
+extern OSModuleQueue __OSModuleInfoList;
+__asm__(".set __OSModuleInfoList, 0x800030C8");
+extern void *__OSStringTable;
+__asm__(".set __OSStringTable, 0x800030D0");
 
 void __OSModuleInit(void)
 {

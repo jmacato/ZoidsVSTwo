@@ -39,7 +39,7 @@ void OSCreateAlarm(OSAlarm *alarm)
 {
     alarm->handler = 0;
 }
-static void InsertAlarm(OSAlarm *alarm, OSTime fire, OSAlarmHandler handler)
+void InsertAlarm(OSAlarm *alarm, OSTime fire, OSAlarmHandler handler)
 {
     OSAlarm *next;
     OSAlarm *prev;
@@ -127,7 +127,7 @@ void OSCancelAlarm(OSAlarm *alarm)
 }
 /* The original assembly interrupt entry calls this private C callback. */
 #pragma force_active on
-static void DecrementerExceptionCallback(register __OSException exception,
+void DecrementerExceptionCallback(register __OSException exception,
                                          register OSContext *context)
 {
     OSAlarm *alarm;

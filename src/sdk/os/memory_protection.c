@@ -10,7 +10,8 @@
 #define OS_INTERRUPTMASK_MEM_RESET                                                     \
     (OS_INTERRUPTMASK_MEM_0 | OS_INTERRUPTMASK_MEM_1 | OS_INTERRUPTMASK_MEM_2 |        \
      OS_INTERRUPTMASK_MEM_3)
-extern volatile u16 __MEMRegs[32] : 0xCC004000;
+extern volatile u16 __MEMRegs[32];
+__asm__(".set __MEMRegs, 0xCC004000");
 #define OSPhysicalToCached(address) ((void *)((u32)(address) + 0x80000000))
 extern void Config24MB(void);
 extern void Config48MB(void);

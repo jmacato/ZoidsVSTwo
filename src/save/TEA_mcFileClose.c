@@ -1,7 +1,8 @@
 #include "card.h"
 #include "os_time.h"
 
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 extern s32 MemCardStatus[2];
 extern s32 MemcardNowSlot;
 extern CARDFileInfo MemCardFileInfo;

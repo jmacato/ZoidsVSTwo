@@ -1,5 +1,6 @@
 #include "os_time.h"
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 extern s64 TEA_time_setm;
 extern s64 TEA_time_set;
 

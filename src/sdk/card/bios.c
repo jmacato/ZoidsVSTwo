@@ -15,7 +15,8 @@
 #define OSPhysicalToCached(value) ((void *)((u32)(value) + 0x80000000))
 #define OSMillisecondsToTicks(value) ((value) * (__OSBusClock / 4 / 1000))
 #define OSSecondsToTicks(value) ((value) * (__OSBusClock / 4))
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 extern void DCInvalidateRange(void *, u32);
 extern void DCFlushRange(void *, u32);
 struct CARDControl __CARDBlock[2];

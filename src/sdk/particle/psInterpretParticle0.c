@@ -57,7 +57,7 @@ static inline s32 HSD_JObjMtxIsDirty(HSD_JObj *jobj)
     return result;
 }
 
-static inline void HSD_JObjSetupMatrix(HSD_JObj *jobj)
+__attribute__((weak)) inline void HSD_JObjSetupMatrix(HSD_JObj *jobj)
 {
     if (!jobj) {
         return;

@@ -1146,7 +1146,6 @@ extern s32 detSaveNo;
 extern s32 detZoidCstm;
 extern s32 detZoidn;
 extern s32 detZoidPerson;
-extern Mtx dspMtx;
 extern s32 dtMain[16];
 extern f32 eyeCam[3];
 extern s16 flag_AllHavePartsList;
@@ -1270,7 +1269,7 @@ extern void zdVoiceScript(ZoidState *zoid);
 extern void *binB(void *bin, s32 index);
 extern s32 zdVoiceScriptCalc(VoiceEntry *entry, ZoidState *zoid, s32 a, s32 b);
 #pragma force_active on
-static s32 dtMain[16];
+s32 dtMain[16];
 static Mtx dspMtx;
 void *menu_zoidp[150];
 void *menu_personp[71];
@@ -1313,17 +1312,17 @@ s16 menusetmh[20];
 ButtonAnim menusetbtanm[12];
 s16 menusetcl[20];
 s16 menusetmn[20];
-static f32 lookCam[3];
+f32 lookCam[3];
 u8 menufarmjfl[20];
 f32 menu_zoideyecam[3];
-static char flPictureF[200];
+char flPictureF[200];
 char menuyesnoshopmsg[80];
 char menudemoselstr1[80];
 char menudemoselstr2[80];
 u8 Tea_demomsg[2200];
 s16 menudemocha[6];
 s16 Tea_demomenu[11];
-static s32 voiceSn2[20];
+s32 voiceSn2[20];
 u32 TXT_Menu[1178] = {
     0x00000000, 0x00000015, 0x00000032, 0x0000004A, 0x00000067, 0x000000EF, 0x00000177, 0x00000189, 
     0x000001A5, 0x000001BD, 0x000001D4, 0x00000202, 0x00000206, 0x0000028E, 0x00000316, 0x0000031A, 
@@ -1772,13 +1771,13 @@ static u32 addManVs35[11] = {
     0x00000012, 0x00000013, 0x00000014, 0x00000015, 0x00000016, 0x00000018, 0x00000019, 0x0000001A, 
     0x0000002F, 0x0000003B, 0xFFFFFFFF, 
 };
-static s16 custmVs[32] = {
+s16 custmVs[32] = {
     0, 2, 9, 12, 18, 23, 34, 44, 
     52, 59, 63, 65, 68, 74, 77, 86, 
     94, 102, 125, 128, -1, -1, -1, -1, 
     -1, -1, -1, -1, -1, -1, -1, -1, 
 };
-static s16 humanVs[60] = {
+s16 humanVs[60] = {
     0, 1, 2, 16, 17, 23, 60, 61, 
     -1, -1, -1, -1, -1, -1, -1, -1, 
     -1, -1, -1, -1, -1, -1, -1, -1, 
@@ -1788,13 +1787,13 @@ static s16 humanVs[60] = {
     -1, -1, -1, -1, -1, -1, -1, -1, 
     -1, -1, -1, -1, 
 };
-static s16 custmFist[32] = {
+s16 custmFist[32] = {
     0, 2, 9, 12, 18, 23, 34, 44, 
     52, 59, 63, 65, 68, 74, 77, 86, 
     94, 102, 125, 128, -1, -1, -1, -1, 
     -1, -1, -1, -1, -1, -1, -1, -1, 
 };
-static s16 humanFist[60] = {
+s16 humanFist[60] = {
     0, 1, 2, 16, 17, 23, 60, 61, 
     -1, -1, -1, -1, -1, -1, -1, -1, 
     -1, -1, -1, -1, -1, -1, -1, -1, 
@@ -4188,11 +4187,11 @@ char *GetMenuMsgAdr(s16 msg)
     return (char *)TXT_Menu_dat + offset;
 }
 #pragma force_active on
-static s32 detZoidCstm = -1;
-static s32 detZoidPerson = -2;
-static s32 detPartsn = -1;
-static s32 detPersonn = -1;
-static f32 shininess = 16.0f;
+s32 detZoidCstm = -1;
+s32 detZoidPerson = -2;
+s32 detPartsn = -1;
+s32 detPersonn = -1;
+f32 shininess = 16.0f;
 CameraState *menucam = (CameraState *)&sCamera;
 s32 menuCursor = 1;
 s32 menuParticles = 1;
@@ -5500,7 +5499,8 @@ void ttlMenuKeyClr1P2P(s32 pad1, s32 pad2)
 extern s32 TEA_mcMsgYesNoEx(s32 slot, s16 message);
 extern s32 TEA_menufnc12p(s16 *a, s16 *b, s16 c, s16 d);
 extern s64 gametimenow;
-extern u32 __OSBusClock : 0x800000F8;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 s32 ttlMenuBatSaveLoad1P2P(s32 mode, s32 a, s32 b)
 {
     s16 x21 = 0;
@@ -6929,7 +6929,7 @@ s32 menufncZoidBattle_BattleMenuEntry(void)
 #undef lit_3946
 #define lit_3946 "dummy\n"
 #pragma force_active on
-static f32 eyeCam[3] = {
+f32 eyeCam[3] = {
     0.0f, 0.0f, 100.0f, 
 };
 #pragma force_active off
@@ -14471,7 +14471,7 @@ void menuMissionGo(void)
 #undef lit_7765
 #define lit_7765 "p0=%d p1=%d p2=%d p3=%d \n"
 #pragma force_active on
-static u32 demoPicMan[395] = {
+u32 demoPicMan[395] = {
     0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x20, 0x20, 
     0x20, 0x20, 0x20, 0x21, 0x21, 0x21, 0x21, 0x21, 
     0x21, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x23, 
@@ -18236,15 +18236,15 @@ s32 menufncZoidVsMenuEntry(void)
 #undef lit_9562
 #define lit_9562 "SaveLoadEnd\n"
 #pragma force_active on
-static s32 VolSeTBL[11] = {
+s32 VolSeTBL[11] = {
     0, 12, 24, 36, 48, 60, 72, 84, 
     96, 108, 120, 
 };
-static s32 VolBgmTBL[11] = {
+s32 VolBgmTBL[11] = {
     0, 12, 24, 36, 48, 60, 72, 84, 
     96, 108, 120, 
 };
-static s32 VolVoiceTBL[11] = {
+s32 VolVoiceTBL[11] = {
     0, 12, 24, 36, 48, 60, 72, 84, 
     96, 108, 120, 
 };
@@ -18291,7 +18291,7 @@ SampleVoice samplevoiceno[100] = {
 u32 VsTimeTBL[5] = {
     1, 3, 5, 0xA, 0xFFFFFFFF, 
 };
-static s32 menuMax[7] = {
+s32 menuMax[7] = {
     2, 2, 1, 1, 1, 1, 0, 
 };
 s32 voiceSn[5][20] = {
@@ -19658,21 +19658,21 @@ void dispVsTime(MenuArchive *archive)
     }
 }
 #pragma force_active on
-static char *tst999 = (char *)lit_7371;
+char *tst999 = (char *)lit_7371;
 s16 menudemomsg = -1;
 s16 menudemobg = -1;
 s16 menudemobgm = -1;
 s16 menudemovno = -1;
 s16 menudemojmp = -1;
 s16 menudemoselect = -1;
-static s32 anmN = 1;
+s32 anmN = 1;
 s32 VolSe = 8;
 s32 VolBgm = 8;
 s32 VolVoice = 8;
 s32 rumble = 1;
 s32 VsTime = 1;
 s32 VsMode = 1;
-static s32 TestBgm = 1;
+s32 TestBgm = 1;
 #pragma force_active off
 
 void dispVsMode(MenuArchive *archive)
@@ -20645,13 +20645,13 @@ void menu_sDispDetailAll(void)
     }
 }
 #pragma force_active on
-static s32 detSaveNo;
-static s32 detZoidn;
+s32 detSaveNo;
+s32 detZoidn;
 void *menu_detail1p;
 void *menu_back1p;
 void *menu1p;
 MenuArchive *menu_yesnop;
-static HSD_LObj *ttlLight;
+HSD_LObj *ttlLight;
 u8 menuZoidBattleModeSingleTeam;
 s16 menuDetailMode;
 void *menu_saveloadp;
@@ -20676,11 +20676,11 @@ s8 menuzoidhavepartslist;
 s8 menumodeShop;
 s16 menuwepdispnum;
 s16 menusaveloadmode;
-static f32 lookCamY;
-static void *flPicture;
-static s32 flPictureT;
+f32 lookCamY;
+void *flPicture;
+s32 flPictureT;
 s16 menudispshophavezoidlist;
-static void *yokoSeTBL;
+void *yokoSeTBL;
 s16 menudemop;
 s16 menudemoC;
 s16 menudemokeywait;
@@ -20690,25 +20690,25 @@ s32 menudemoend;
 s32 MenuDemoSkipFlag;
 s16 ttl_vs_modeLR;
 void *menu1p_map;
-static s32 stage00;
-static s32 vsMapMax;
+s32 stage00;
+s32 vsMapMax;
 s32 rumbleTm;
-static s32 VolSe3;
-static s32 VolBgm3;
-static s32 VolVoice3;
-static s32 rumble93;
-static s32 VsTime3;
-static s32 VsMode3;
-static s32 TestVoice;
-static s32 sbN;
-static s32 sbT;
-static s32 sbTO;
-static s32 sbTA;
-static s32 crN;
-static s32 crO;
-static s32 csO;
-static s32 csN;
-static s32 csA;
-static s32 csAO;
+s32 VolSe3;
+s32 VolBgm3;
+s32 VolVoice3;
+s32 rumble93;
+s32 VsTime3;
+s32 VsMode3;
+s32 TestVoice;
+s32 sbN;
+s32 sbT;
+s32 sbTO;
+s32 sbTA;
+s32 crN;
+s32 crO;
+s32 csO;
+s32 csN;
+s32 csA;
+s32 csAO;
 #pragma force_active off
 }

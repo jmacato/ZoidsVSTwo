@@ -10,10 +10,13 @@
 #define OSMicrosecondsToTicks(value) ((value) * (__OSBusClock / 4 / 125000) / 8)
 #define OSSecondsToTicks(value) ((value) * (__OSBusClock / 4))
 #define OSTicksToSeconds(value) ((value) / (__OSBusClock / 4))
-extern u32 __OSBusClock : 0x800000F8;
-extern volatile u32 __PIRegs[12] : 0xCC003000;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
+extern volatile u32 __PIRegs[12];
+__asm__(".set __PIRegs, 0xCC003000");
 extern s64 __OSStartTime;
-u8 GameChoice : 0x800030E3;
+extern u8 GameChoice;
+__asm__(".set GameChoice, 0x800030E3");
 
 static OSResetCallback ResetCallback;
 

@@ -17,8 +17,10 @@
 #define NULL 0
 #define OSPhysicalToCached(x) ((void *)((u32)(x) + 0x80000000))
 typedef int BOOL;
-extern volatile u16 __VIRegs[] : 0xCC002000;
-extern u32 __OSTVMode : 0x800000CC;
+extern volatile u16 __VIRegs[];
+__asm__(".set __VIRegs, 0xCC002000");
+extern u32 __OSTVMode;
+__asm__(".set __OSTVMode, 0x800000CC");
 extern void __VIInitPhilips(void);
 typedef struct {
     u8 equ;

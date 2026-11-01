@@ -11,8 +11,10 @@
 #define DSP_DMA_START_LO 25
 #define DSP_ARAM_DMA_MM_HI 16
 #define DSP_ARAM_DMA_MM_LO 17
-extern volatile u16 __DSPRegs[32] : 0xCC005000;
-extern volatile u32 __DIRegs[16] : 0xCC006000;
+extern volatile u16 __DSPRegs[32];
+__asm__(".set __DSPRegs, 0xCC005000");
+extern volatile u32 __DIRegs[16];
+__asm__(".set __DIRegs, 0xCC006000");
 extern s32 vprintf(const char *, va_list);
 extern u32 OSGetStackPointer(void);
 extern s64 OSGetTime(void);

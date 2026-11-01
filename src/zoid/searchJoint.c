@@ -42,7 +42,7 @@ static HSD_JObj *search_PARTS(HSD_JObj *joint, HSD_JObjDesc *description, HSD_JO
     return 0;
 }
 
-static HSD_JObj *searchJoint(SJZoid *zoid, const char *part)
+HSD_JObj *searchJoint(SJZoid *zoid, const char *part)
 {
     char name[256];
     HSD_JObjDesc *description;

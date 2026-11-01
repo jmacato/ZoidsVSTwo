@@ -3,9 +3,12 @@
 #include "os_interrupt.h"
 #define NULL 0
 #define IsSuspended(suspend) (suspend > 0)
-extern OSThread *__gUnkThread1 : 0x800000D8;
-extern OSThread *__gCurrentThread : 0x800000E4;
-extern OSThreadQueue __OSActiveThreadQueue : 0x800000DC;
+extern OSThread *__gUnkThread1;
+__asm__(".set __gUnkThread1, 0x800000D8");
+extern OSThread *__gCurrentThread;
+__asm__(".set __gCurrentThread, 0x800000E4");
+extern OSThreadQueue __OSActiveThreadQueue;
+__asm__(".set __OSActiveThreadQueue, 0x800000DC");
 extern unsigned char _stack_addr[];
 extern unsigned char _stack_end[];
 extern u32 OSSaveContext(OSContext *);

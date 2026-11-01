@@ -10,9 +10,12 @@
 #define OSMillisecondsToTicks(value) ((value) * (__OSBusClock / 4 / 1000))
 #define OSMicrosecondsToTicks(value) ((value) * (__OSBusClock / 4 / 125000) / 8)
 #define OSSecondsToTicks(value) ((value) * (__OSBusClock / 4))
-extern u32 __OSBusClock : 0x800000F8;
-extern volatile u32 __PIRegs[12] : 0xCC003000;
-extern volatile u32 __DIRegs[16] : 0xCC006000;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
+extern volatile u32 __PIRegs[12];
+__asm__(".set __PIRegs, 0xCC003000");
+extern volatile u32 __DIRegs[16];
+__asm__(".set __DIRegs, 0xCC006000");
 static s32 FirstRead = TRUE;
 static volatile s32 StopAtNextInt = FALSE;
 static u32 LastLength = 0;

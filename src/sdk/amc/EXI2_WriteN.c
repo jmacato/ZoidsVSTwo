@@ -4,7 +4,8 @@
 
 #define FALSE 0
 
-extern volatile u32 __PIRegs[16] : 0xCC003000;
+extern volatile u32 __PIRegs[16];
+__asm__(".set __PIRegs, 0xCC003000");
 extern s32 OSDisableInterrupts(void);
 extern s32 OSRestoreInterrupts(s32);
 extern int printf(const char *, ...);

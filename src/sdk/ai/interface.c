@@ -8,13 +8,16 @@ static void __AIDHandler(s16 interrupt, OSContext *context);
 static void __AISHandler(s16 interrupt, OSContext *context);
 static void __AI_SRC_INIT(void);
 extern void __AICallbackStackSwitch(AIDCallback callback);
-extern volatile u16 __DSPRegs[32] : 0xCC005000;
+extern volatile u16 __DSPRegs[32];
+__asm__(".set __DSPRegs, 0xCC005000");
 #define DSP_DMA_START_HI 24
 #define DSP_DMA_START_LO 25
 #define DSP_DMA_CONTROL_LEN 27
 #define DSP_DMA_START_FLAG 0x8000
-extern volatile u32 __AIRegs[4] : 0xCC006C00;
-extern u32 __OSBusClock : 0x800000F8;
+extern volatile u32 __AIRegs[4];
+__asm__(".set __AIRegs, 0xCC006C00");
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
 #define OSNanosecondsToTicks(nsec) (((nsec) * (__OSBusClock / 4 / 125000)) / 8000)
 extern s64 OSGetTime(void);
 static AISCallback __AIS_Callback = 0;

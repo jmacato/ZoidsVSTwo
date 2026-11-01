@@ -17,11 +17,16 @@
 #define OS_DEBUG_ADDRESS_2 0x800030E9
 #define DI_CONFIG_IDX 9
 #define DI_CONFIG_CONFIG_MASK 0xFF
-extern volatile u32 __PIRegs[16] : 0xCC003000;
-extern volatile u32 __DIRegs[16] : 0xCC006000;
-extern volatile u16 __OSDeviceCode : 0x800030E6;
-extern void *BOOT_REGION_START : 0x812FDFF0;
-extern void *BOOT_REGION_END : 0x812FDFEC;
+extern volatile u32 __PIRegs[16];
+__asm__(".set __PIRegs, 0xCC003000");
+extern volatile u32 __DIRegs[16];
+__asm__(".set __DIRegs, 0xCC006000");
+extern volatile u16 __OSDeviceCode;
+__asm__(".set __OSDeviceCode, 0x800030E6");
+extern void *BOOT_REGION_START;
+__asm__(".set BOOT_REGION_START, 0x812FDFF0");
+extern void *BOOT_REGION_END;
+__asm__(".set BOOT_REGION_END, 0x812FDFEC");
 typedef OSExceptionHandler __OSExceptionHandler;
 extern __OSExceptionHandler __OSSetExceptionHandler(u8, __OSExceptionHandler);
 extern __OSExceptionHandler __OSGetExceptionHandler(u8);

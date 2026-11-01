@@ -263,8 +263,8 @@ s32 sWpSearchSight1z(WeaponState3 *weapon, ZoidState *zoid, ZoidState *target);
 s32 sWpSearchSight1g(WeaponState3 *weapon, ZoidState *zoid, s32 index);
 #pragma force_active on
 WeaponState3 sWeapon[100];
-static Lsr2 sLsr[11];
-static Lsr1_3 sLsr1[400];
+Lsr2 sLsr[11];
+Lsr1_3 sLsr1[400];
 #pragma force_active off
 void sWeaponPrologue(void)
 {

@@ -6,7 +6,8 @@
 #define VI_PAL 1
 #define VI_MPAL 2
 #define VI_EURGB60 5
-extern volatile u16 __VIRegs[64] : 0xCC002000;
+extern volatile u16 __VIRegs[64];
+__asm__(".set __VIRegs, 0xCC002000");
 extern u32 VIGetTvFormat(void);
 #pragma dont_inline on
 static u32 SamplingRate;

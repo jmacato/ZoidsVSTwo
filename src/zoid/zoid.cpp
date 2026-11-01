@@ -10256,15 +10256,15 @@ s32 ZoidGround(ZoidState *zoid)
     return hit;
 }
 #pragma force_active on
-static ModelArchive *sdTest;
-static u32 dbgZoidColi;
+ModelArchive *sdTest;
+u32 dbgZoidColi;
 u32 sZoidEx;
 s32 sZoidHG;
 ModelArchive *steFile;
 void *steMobj;
-static s32 csrDispON;
-static ModelArchive *csrFile;
-static s32 csrNum = -1;
+s32 csrDispON;
+ModelArchive *csrFile;
+s32 csrNum = -1;
 #pragma explicit_zero_data on
 static u8 gap_802F14F4[4] = { 0x00, 0x00, 0x00, 0x00 };
 #pragma explicit_zero_data off

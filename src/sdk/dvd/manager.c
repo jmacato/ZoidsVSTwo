@@ -10,8 +10,10 @@
 #define OSPhysicalToCached(value) ((void *)((u32)(value) + 0x80000000))
 #define OSRoundUp32B(value) (((u32)(value) + 31) & ~31)
 #define OSMillisecondsToTicks(value) ((value) * (__OSBusClock / 4 / 1000))
-extern u32 __OSBusClock : 0x800000F8;
-extern volatile u32 __DIRegs[16] : 0xCC006000;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
+extern volatile u32 __DIRegs[16];
+__asm__(".set __DIRegs, 0xCC006000");
 extern void DCInvalidateRange(void *, u32);
 extern void *memcpy(void *, const void *, u32);
 extern int memcmp(const void *, const void *, u32);

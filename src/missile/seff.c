@@ -49,7 +49,7 @@ static inline void HSD_JObjSetTranslateX(HSD_JObj *jobj, f32 value)
 }
 
 static ModelArchive *efctFile[136];
-static Effect sEffect[100];
+Effect sEffect[100];
 
 void sEffectPrologueU(s32 force)
 {

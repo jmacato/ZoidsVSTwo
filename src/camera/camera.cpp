@@ -536,11 +536,11 @@ extern f32 sLiner(f32 a, f32 b, f32 t);
 void sCameraCtrl(CameraState2 *camera);
 #pragma force_active on
 u64 sCamera[712];
-static IntSeE IntSe[32];
-static char vcSeekStr[200];
-static char vcSeekNow[200];
-static u8 vcSeekIfo[60];
-static RrrBuf rrrbuf;
+IntSeE IntSe[32];
+char vcSeekStr[200];
+char vcSeekNow[200];
+u8 vcSeekIfo[60];
+RrrBuf rrrbuf;
 static u32 camNormal_pos_wobjdesc[5] = {
     0x00000000, 0x41A00000, 0x41A00000, 0x41A00000, 0x00000000, 
 };
@@ -2145,7 +2145,7 @@ s32 camVoiceSeekFile(char *name)
     if (DVDFastOpen(entry, vcSeekIfo) == 0)
         return 0;
     vcSeekMode = 1;
-    if (DVDReadAsyncPrio(vcSeekIfo, &rrrbuf, 0x100, 0, camVoiceSeekCB, 0) == 0) {
+    if (DVDReadAsyncPrio(vcSeekIfo, &rrrbuf, 0x100, 0, (void *)camVoiceSeekCB, 0) == 0) {
         DVDClose(vcSeekIfo);
         vcSeekMode = 0;
         return 0;
@@ -2520,7 +2520,7 @@ void camOnWin(CameraState2 *camera)
 }
 #pragma force_active on
 s32 sCamMuteki;
-static s32 vcSeekMode2;
+s32 vcSeekMode2;
 s32 vcSeekMode;
 s32 sCamNS;
 u32 sCamNN2;

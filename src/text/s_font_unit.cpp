@@ -238,7 +238,7 @@ void EndeFin(void)
 #undef lit_849
 #define lit_849 "Thank you for your playing!"
 #pragma force_active on
-static s8 *asc00 = (s8 *)lit_371;
-static s8 *asc01 = (s8 *)lit_372;
+s8 *asc00 = (s8 *)lit_371;
+s8 *asc01 = (s8 *)lit_372;
 #pragma force_active off
 }

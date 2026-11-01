@@ -5,8 +5,10 @@
 #include "os_interrupt.h"
 #pragma peephole off
 #define NULL 0
-extern OSContext *__OSCurrentContext : 0x800000D4;
-extern OSContext *__OSFPUContext : 0x800000D8;
+extern OSContext *__OSCurrentContext;
+__asm__(".set __OSCurrentContext, 0x800000D4");
+extern OSContext *__OSFPUContext;
+__asm__(".set __OSFPUContext, 0x800000D8");
 extern void OSSwitchFPUContext(u8, OSContext *);
 extern void OSReport(const char *, ...);
 OSContext *OSGetCurrentContext(void)

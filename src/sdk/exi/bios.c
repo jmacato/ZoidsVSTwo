@@ -9,8 +9,10 @@
 #define NULL 0
 #define OS_CONSOLE_DEVELOPMENT 0x10000000
 #define OSTicksToMilliseconds(ticks) ((ticks) / (__OSBusClock / 4 / 1000))
-extern u32 __OSBusClock : 0x800000F8;
-extern volatile u32 __EXIRegs[15] : 0xCC006800;
+extern u32 __OSBusClock;
+__asm__(".set __OSBusClock, 0x800000F8");
+extern volatile u32 __EXIRegs[15];
+__asm__(".set __EXIRegs, 0xCC006800");
 extern void *memmove(void *, const void *, u32);
 #define MAX_DEV 3
 #define MAX_CHAN 3
@@ -43,7 +45,8 @@ typedef struct EXIControl {
 } EXIControl;
 
 static EXIControl Ecb[MAX_CHAN];
-s32 __EXIProbeStartTime[2] : 0x800030C0;
+extern s32 __EXIProbeStartTime[2];
+__asm__(".set __EXIProbeStartTime, 0x800030C0");
 
 static s32 __EXIProbe(s32 chan);
 
@@ -154,7 +157,7 @@ s32 EXIImmEx(s32 chan, void *buf, s32 len, u32 mode)
             return FALSE;
         }
 
-        (u8 *)buf += xLen;
+        buf = (u8 *)buf + xLen;
         len -= xLen;
     }
     return TRUE;
@@ -188,7 +191,8 @@ s32 EXIDma(s32 chan, void *buf, s32 len, u32 type, EXICallback callback)
     return TRUE;
 }
 
-volatile u16 __OSDeviceCode : 0x800030E6;
+extern volatile u16 __OSDeviceCode;
+__asm__(".set __OSDeviceCode, 0x800030E6");
 
 s32 EXISync(s32 chan)
 {

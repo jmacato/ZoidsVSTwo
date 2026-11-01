@@ -4,7 +4,7 @@
 extern void *memset(void *, s32, u32);
 static HSD_ObjAllocData shadow_alloc_data;
 
-static inline HSD_ObjAllocData *HSD_ShadowGetAllocData(void)
+__attribute__((weak)) inline HSD_ObjAllocData *HSD_ShadowGetAllocData(void)
 {
     return &shadow_alloc_data;
 }
