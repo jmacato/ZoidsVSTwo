@@ -15,8 +15,8 @@ struct Cli {
     /// Output executable
     #[arg(long, default_value = "build/main.dol")]
     output: PathBuf,
-    /// Also write a copy of the disc image with the new DOL (default build/game.iso)
-    #[arg(long, num_args = 0..=1, default_missing_value = "build/game.iso")]
+    /// Also write a copy of the disc image with the new DOL (default build/game-repacked.iso)
+    #[arg(long, num_args = 0..=1, default_missing_value = "build/game-repacked.iso")]
     repack: Option<PathBuf>,
     /// clang to use; defaults to $CLANG or the first clang with a PowerPC backend
     #[arg(long)]
@@ -87,7 +87,10 @@ fn run(cli: Cli) -> Result<()> {
             return Err("--repack must not overwrite the source disc image.".into());
         }
         iso::rebuild(source, &output, &rebuilt)?;
-        println!("Wrote {}.", rebuilt.display());
+        println!(
+            "Repacked disc image: {}",
+            fs::canonicalize(&rebuilt)?.display()
+        );
     }
     println!(
         "Wrote {} in {:.1}s.",

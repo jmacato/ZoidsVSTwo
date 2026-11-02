@@ -27,7 +27,7 @@ Options, passed after `--` (for example `cargo run -- --iso ~/games/zoids.iso`):
 | `--iso PATH` | `game.iso`, or the only `.iso`/`.gcm` file in the repository root |
 | `--clang PATH` | `$CLANG`, then the first clang on `PATH` or in the usual LLVM install folders that can target PowerPC |
 | `--output PATH` | `build/main.dol` |
-| `--repack [PATH]` | off; with no path, writes `build/game.iso`: the disc rebuilt with the new `main.dol`, every file laid out again, so the DOL can be any size |
+| `--repack [PATH]` | off; with no path, writes `build/game-repacked.iso`: the disc rebuilt with the new `main.dol`, every file laid out again, so the DOL can be any size; the source image is never modified |
 | `--jobs N` | number of CPU cores |
 
 ## How the build works
