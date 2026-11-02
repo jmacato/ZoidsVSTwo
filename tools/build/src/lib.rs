@@ -2,6 +2,7 @@ pub mod compile;
 pub mod disc;
 pub mod dol;
 pub mod elf;
+pub mod iso;
 pub mod link;
 pub mod names;
 pub mod strip;

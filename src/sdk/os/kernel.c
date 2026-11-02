@@ -202,9 +202,11 @@ void OSInit(void)
     __DVDLongFileNameFlag = 1;
 
     OSSetArenaLo(!BootInfo->arenaLo ? &__ArenaLo : BootInfo->arenaLo);
+#ifndef __clang__
     if (!BootInfo->arenaLo && BI2DebugFlag && (*(u32 *)BI2DebugFlag < 2)) {
         OSSetArenaLo((void *)(((u32)(char *)&_stack_addr + 0x1F) & 0xFFFFFFE0));
     }
+#endif
     OSSetArenaHi((!BootInfo->arenaHi) ? &__ArenaHi : BootInfo->arenaHi);
     OSExceptionInit();
     __OSInitSystemCall();

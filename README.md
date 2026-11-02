@@ -27,6 +27,7 @@ Options, passed after `--` (for example `cargo run -- --iso ~/games/zoids.iso`):
 | `--iso PATH` | `game.iso`, or the only `.iso`/`.gcm` file in the repository root |
 | `--clang PATH` | `$CLANG`, then the first clang on `PATH` or in the usual LLVM install folders that can target PowerPC |
 | `--output PATH` | `build/main.dol` |
+| `--repack [PATH]` | off; with no path, writes `build/game.iso`: the disc rebuilt with the new `main.dol`, every file laid out again, so the DOL can be any size |
 | `--jobs N` | number of CPU cores |
 
 ## How the build works
@@ -38,7 +39,7 @@ The disc contains `zoidR.elf`, the fully linked game with its symbol table and r
 3. Functions written as Metrowerks inline assembly cannot be compiled by clang. There are 96 of them: OS context switching and exception handlers, cache control, paired-single matrix math, the THP video decoder and the MetroTRK debugger. The tool copies these from the original executable and relocates them. They are marked `original` in `build/main.map`.
 4. Data that exists only in the clang build (string literals, constants, a few function-local statics, about 41 KiB) is placed at the original start of the heap, and `__ArenaLo` moves up by the same amount.
 
-The build has not yet been boot-tested on hardware or in an emulator.
+In Dolphin, the rebuilt disc boots and loads the same files in the same order as the original, up to the memory card prompt. It has not been played further or tested on hardware.
 
 ## Layout
 

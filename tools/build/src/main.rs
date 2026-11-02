@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
     time::Instant,
 };
-use zoids_build::{Result, compile, disc, elf::Elf, link, root, toolchain};
+use zoids_build::{Result, compile, disc, elf::Elf, iso, link, root, toolchain};
 
 #[derive(Parser)]
 #[command(about = "Build the Zoids: Battle Legends decompilation with clang")]
@@ -15,6 +15,9 @@ struct Cli {
     /// Output executable
     #[arg(long, default_value = "build/main.dol")]
     output: PathBuf,
+    /// Also write a copy of the disc image with the new DOL (default build/game.iso)
+    #[arg(long, num_args = 0..=1, default_missing_value = "build/game.iso")]
+    repack: Option<PathBuf>,
     /// clang to use; defaults to $CLANG or the first clang with a PowerPC backend
     #[arg(long)]
     clang: Option<PathBuf>,
@@ -42,8 +45,17 @@ fn find_iso(root: &Path) -> Option<PathBuf> {
 fn run(cli: Cli) -> Result<()> {
     let started = Instant::now();
     let root = root();
-    let iso = cli.iso.or_else(|| find_iso(&root));
-    let (dol, elf) = disc::cached_reference(iso.as_deref())?;
+    let image = cli.iso.or_else(|| find_iso(&root));
+    let source = match (&cli.repack, &image) {
+        (Some(_), None) => {
+            return Err(
+                "--repack needs the disc image: put it at game.iso in the repository root, or pass --iso PATH."
+                    .into(),
+            );
+        }
+        (_, source) => source.as_deref(),
+    };
+    let (dol, elf) = disc::cached_reference(image.as_deref())?;
     let clang = toolchain::find(cli.clang.as_deref())?;
     println!("Using {} ({})", clang.path.display(), clang.version);
     let units = compile::compile_all(&clang, cli.jobs)?;
@@ -66,6 +78,17 @@ fn run(cli: Cli) -> Result<()> {
         report.data_size / 1024,
         report.data_address
     );
+    if let (Some(repack), Some(source)) = (&cli.repack, source) {
+        let rebuilt = root.join(repack);
+        if let Some(parent) = rebuilt.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        if rebuilt.exists() && fs::canonicalize(&rebuilt)? == fs::canonicalize(source)? {
+            return Err("--repack must not overwrite the source disc image.".into());
+        }
+        iso::rebuild(source, &output, &rebuilt)?;
+        println!("Wrote {}.", rebuilt.display());
+    }
     println!(
         "Wrote {} in {:.1}s.",
         path.display(),
