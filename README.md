@@ -39,4 +39,4 @@ Use a disc image at another path with `make verify ISO=path/to/game.iso`. A comp
 
 ## License
 
-MIT. See `LICENSE`. If you use this project's code or findings in your own work, see `NOTICE` for how to credit it.
+GNU AGPL 3.0 only (`AGPL-3.0-only`). See `LICENSE`. If you distribute a modified version, or run one for users over a network, you must release its source under the same license. If you use this project's code or findings in your own work, see `NOTICE` for how to credit it.

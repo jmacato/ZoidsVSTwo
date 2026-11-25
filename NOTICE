@@ -1,7 +1,9 @@
 Zoids VS. II decompilation
 Copyright (c) 2026 Jumar Macato
 
-This project is released under the MIT license (see LICENSE). The license requires that its copyright notice and permission notice stay with all copies or substantial portions of the code.
+This project is licensed under the GNU Affero General Public License, version 3 only (SPDX: AGPL-3.0-only). See LICENSE.
+
+If you distribute a modified version, or run one for users over a network, you must offer those users the complete source of your version under the same license.
 
 If you use code, names, structure or findings from this project in your own work, credit it in that work's README:
 
